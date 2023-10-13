@@ -1,6 +1,7 @@
 package message
 
 import (
+	"Telegram/pkg/bot"
 	"Telegram/pkg/errors"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -8,7 +9,19 @@ import (
 	"net/http"
 )
 
-func HandleMessage(ctx *gin.Context) {
+type IHandler interface {
+	HandleUpdate(ctx *gin.Context)
+}
+
+type Handler struct {
+	bot *tgbotapi.BotAPI
+}
+
+func NewHandler(bot *tgbotapi.BotAPI) *Handler {
+	return &Handler{bot: bot}
+}
+
+func (h *Handler) HandleUpdate(ctx *gin.Context) {
 	var update tgbotapi.Update
 
 	err := json.NewDecoder(ctx.Request.Body).Decode(&update)
@@ -17,7 +30,7 @@ func HandleMessage(ctx *gin.Context) {
 		return
 	}
 
-	//bot.HandleUpdate(bot, &update)
+	bot.HandleUpdate(h.bot, &update)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "ok",
