@@ -1,7 +1,7 @@
 package models
 
 type Tutor struct {
-	Id        string `json:"tutor_id"`
-	Name      string `json:"name"`
+	Model
+	ID        string `json:"id" gorm:"primary_key"`
 	ShortName string `json:"short_name"`
 }

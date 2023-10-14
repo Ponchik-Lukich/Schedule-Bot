@@ -1,13 +1,14 @@
 package models
 
 type Room struct {
-	Id           string `json:"room_id"`
-	Name         string `json:"name"`
-	Building     string `json:"building"`
-	Laboratory   bool   `json:"is_laboratory"`
-	Computer     bool   `json:"has_computer"`
-	Projector    bool   `json:"has_projector"`
-	Availability bool   `json:"is_available"`
-	Dot          bool   `json:"has_dot"`
-	Temporary    bool   `json:"is_temporary"`
+	Model
+	ID             string `json:"id" gorm:"primary_key"`
+	Name           string `json:"name"`
+	Building       string `json:"building"`
+	IsLaboratory   bool   `json:"is_laboratory"`
+	HasComputer    bool   `json:"has_computer"`
+	HasProjector   bool   `json:"has_projector"`
+	IsAvailability bool   `json:"is_available"`
+	HasDot         bool   `json:"has_dot"`
+	IsTemporary    bool   `json:"is_temporary"`
 }
