@@ -5,18 +5,62 @@ import (
 	"log"
 )
 
-func HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
-	if update.Message != nil {
-		if update.Message.IsCommand() && update.Message.Command() == "start" {
-			handleStart(bot, update)
-		}
-	}
+func createMainKeyboard() tgbotapi.ReplyKeyboardMarkup {
+	keyboard := tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("Поиск свободного кабинета"),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("Информация о кабинете"),
+		),
+	)
+	keyboard.ResizeKeyboard = true
+	keyboard.OneTimeKeyboard = true
+
+	return keyboard
 }
 
-func handleStart(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Hello!")
-	if _, err := bot.Send(msg); err != nil {
-		log.Fatal(err)
+func createMiniKeyboard() tgbotapi.ReplyKeyboardMarkup {
+	keyboard := tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("Назад"),
+		),
+	)
+	keyboard.ResizeKeyboard = true
+	keyboard.OneTimeKeyboard = true
+
+	return keyboard
+}
+
+func HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
+	if update.Message == nil {
+		return
+	}
+
+	var responseText string
+	var replyMarkup interface{}
+
+	switch update.Message.Text {
+	case "Поиск свободного кабинета":
+		responseText = "Here's the info for free rooms..."
+		replyMarkup = createMiniKeyboard()
+	case "Информация о кабинете":
+		responseText = "Here's the room information..."
+		replyMarkup = createMiniKeyboard()
+	case "Назад":
+		responseText = "Choose an option:"
+		replyMarkup = createMainKeyboard()
+	default:
+		responseText = "Choose an option:"
+		replyMarkup = createMainKeyboard()
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
+	msg.ReplyMarkup = replyMarkup
+
+	_, err := bot.Send(msg)
+	if err != nil {
+		log.Println(err)
 	}
 }
 

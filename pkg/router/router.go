@@ -1,8 +1,8 @@
 package router
 
 import (
-	"Telegram/pkg/handlers/message"
-	"Telegram/pkg/handlers/test"
+	"Telegram/pkg/handlers/web/message"
+	"Telegram/pkg/handlers/web/test"
 	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
 	"github.com/gin-gonic/gin"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
