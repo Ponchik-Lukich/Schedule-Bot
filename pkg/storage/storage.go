@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"Telegram/pkg/constant"
+	"Telegram/pkg/constants"
 	errorsMes "Telegram/pkg/errors"
 	"Telegram/pkg/storage/ydb"
 	"errors"
@@ -16,7 +16,7 @@ type Storage interface {
 
 func NewStorage(dbType string, cfg Config) (Storage, error) {
 	switch dbType {
-	case constant.Ydb:
+	case constants.Ydb:
 		if ydbCfg, ok := cfg.(*ydb.Config); ok {
 			return ydb.NewStorage(*ydbCfg), nil
 		} else {

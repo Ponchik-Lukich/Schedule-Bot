@@ -16,7 +16,40 @@ import (
 	"strings"
 )
 
+func init() {
+	err := LoadConfiguration()
+	if err != nil {
+		log.Fatalf("failed to load configuration: %v", err)
+	}
+
+	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
+	if botToken == "" {
+		log.Fatalf("log token is rquired")
+	}
+
+	_, err = InitializeStorage()
+	if err != nil {
+		log.Fatalf("failed to initialize storage: %v", err)
+	}
+
+	botAPI, err := tgbotapi.NewBotAPI(botToken)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	handlerAdapter = router.SetupRouter(botAPI)
+}
+
 var handlerAdapter *httpadapter.HandlerAdapter
+
+func Handler(ctx context.Context, event *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	fullPath := event.Headers["X-Envoy-Original-Path"]
+	fullPath = strings.Split(fullPath, "?")[0]
+	event.Path = fullPath
+
+	response, err := handlerAdapter.ProxyWithContext(ctx, *event)
+	return &response, err
+}
 
 func LoadConfiguration() error {
 	err := godotenv.Load()
@@ -49,47 +82,7 @@ func InitializeStorage() (storage.Storage, error) {
 	return db, nil
 }
 
-func Handler(ctx context.Context, event *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	fullPath := event.Headers["X-Envoy-Original-Path"]
-	fullPath = strings.Split(fullPath, "?")[0]
-	event.Path = fullPath
-
-	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
-	if botToken == "" {
-		log.Fatalf("log token is rquired")
-	}
-
-	_, err := InitializeStorage()
-	if err != nil {
-		log.Fatalf("failed to initialize storage: %v", err)
-	}
-
-	botAPI, err := tgbotapi.NewBotAPI(botToken)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if handlerAdapter == nil {
-		handlerAdapter = router.SetupRouter(botAPI)
-	}
-
-	response, err := handlerAdapter.ProxyWithContext(ctx, *event)
-	return &response, err
-}
-
 func main() {
-	err := LoadConfiguration()
-	if err != nil {
-		log.Fatalf("failed to load configuration: %v", err)
-	}
-	log.Println("Configuration loaded")
-
-	_, err = InitializeStorage()
-	if err != nil {
-		log.Fatalf("failed to initialize storage: %v", err)
-	}
-	log.Println("Storage initialized")
-
 	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
 	if botToken == "" {
 		log.Fatalf("log token is rquired")
