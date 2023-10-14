@@ -1,6 +1,10 @@
 package ydb
 
 import (
+	"Telegram/pkg/storage/room"
+	"Telegram/pkg/storage/user"
+	ydbRoom "Telegram/pkg/storage/ydb/room"
+	ydbUser "Telegram/pkg/storage/ydb/user"
 	"context"
 	ydb "github.com/PotatoHD404/gorm-driver"
 	environ "github.com/ydb-platform/ydb-go-sdk-auth-environ"
@@ -14,6 +18,10 @@ type Storage struct {
 
 func NewStorage(cfg Config) *Storage {
 	return &Storage{cfg: cfg}
+}
+
+func (s *Storage) Init() *gorm.DB {
+	return s.db
 }
 
 func (s *Storage) Connect() error {
@@ -44,6 +52,10 @@ func (s *Storage) Close() error {
 	return nil
 }
 
-func (s *Storage) Init() *gorm.DB {
-	return s.db
+func (s *Storage) GetUserStorage() user.Storage {
+	return ydbUser.NewStorage(s.db)
+}
+
+func (s *Storage) GetRoomStorage() room.Storage {
+	return ydbRoom.NewStorage(s.db)
 }
