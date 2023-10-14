@@ -9,19 +9,19 @@ import (
 	"net/http"
 )
 
-type IHandler interface {
+type Handler interface {
 	HandleUpdate(ctx *gin.Context)
 }
 
-type Handler struct {
+type handler struct {
 	bot *tgbotapi.BotAPI
 }
 
-func NewHandler(bot *tgbotapi.BotAPI) *Handler {
-	return &Handler{bot: bot}
+func NewHandler(bot *tgbotapi.BotAPI) Handler {
+	return &handler{bot: bot}
 }
 
-func (h *Handler) HandleUpdate(ctx *gin.Context) {
+func (h *handler) HandleUpdate(ctx *gin.Context) {
 	var update tgbotapi.Update
 
 	err := json.NewDecoder(ctx.Request.Body).Decode(&update)

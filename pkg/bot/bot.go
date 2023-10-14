@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-func createMainKeyboard() tgbotapi.ReplyKeyboardMarkup {
+func CreateMainKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	keyboard := tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Поиск свободного кабинета"),
@@ -20,7 +20,7 @@ func createMainKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	return keyboard
 }
 
-func createMiniKeyboard() tgbotapi.ReplyKeyboardMarkup {
+func CreateMiniKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	keyboard := tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Назад"),
@@ -43,16 +43,16 @@ func HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 	switch update.Message.Text {
 	case "Поиск свободного кабинета":
 		responseText = "Here's the info for free rooms..."
-		replyMarkup = createMiniKeyboard()
+		replyMarkup = CreateMiniKeyboard()
 	case "Информация о кабинете":
 		responseText = "Here's the room information..."
-		replyMarkup = createMiniKeyboard()
+		replyMarkup = CreateMiniKeyboard()
 	case "Назад":
 		responseText = "Choose an option:"
-		replyMarkup = createMainKeyboard()
+		replyMarkup = CreateMainKeyboard()
 	default:
 		responseText = "Choose an option:"
-		replyMarkup = createMainKeyboard()
+		replyMarkup = CreateMainKeyboard()
 	}
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
