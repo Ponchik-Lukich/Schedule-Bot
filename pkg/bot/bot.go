@@ -1,7 +1,7 @@
 package bot
 
 import (
-	"Telegram/pkg/handlers/telegram"
+	"Telegram/pkg/handlers/telegram/commands"
 	"Telegram/pkg/repo"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
@@ -25,9 +25,9 @@ func RunBotLocal(botToken string, repos repo.Repositories) {
 
 	for update := range updates {
 		if update.Message.IsCommand() && update.Message.Command() == "start" {
-			telegram.HandleStart(bot, &update, repos.GetUserRepo())
+			commands.HandleStartCom(bot, &update, repos.GetUserRepo())
 			continue
 		}
-		telegram.HandleUpdate(bot, &update, repos.GetUserRepo(), repos.GetRoomRepo())
+		commands.HandleUpdateCom(bot, &update, repos.GetUserRepo(), repos.GetRoomRepo())
 	}
 }

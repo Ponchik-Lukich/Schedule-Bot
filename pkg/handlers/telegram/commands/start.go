@@ -1,4 +1,4 @@
-package telegram
+package commands
 
 import (
 	"Telegram/pkg/bot/functions"
@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func HandleStart(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, userRepo user.Repository) {
+func HandleStartCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, userRepo user.Repository) {
 	chatID := update.Message.Chat.ID
 	err := userRepo.CreateUser(chatID)
 	if err != nil {

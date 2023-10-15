@@ -1,4 +1,4 @@
-package telegram
+package commands
 
 import (
 	"Telegram/pkg/bot/functions"
@@ -10,7 +10,7 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func HandleUpdate(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, userRepo user.Repository, roomRepo room.Repository) {
+func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, userRepo user.Repository, roomRepo room.Repository) {
 	var responseText string
 	var replyMarkup tgbotapi.ReplyKeyboardMarkup
 
@@ -22,39 +22,55 @@ func HandleUpdate(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, userRepo use
 
 	switch update.Message.Text {
 	case cst.Search:
-		responseText, replyMarkup, err = HandleSearch(userRepo, update.Message.Chat.ID, "search")
+		responseText, err = HandleSearchCom(userRepo, update.Message.Chat.ID, "search")
 		if err != nil {
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
+		replyMarkup = keyboard.CreateBuildingKeyboard()
 	case cst.Info:
-		responseText, replyMarkup, err = HandleSearch(userRepo, update.Message.Chat.ID, "info")
+		responseText, err = HandleSearchCom(userRepo, update.Message.Chat.ID, "info")
 		if err != nil {
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
+		replyMarkup = keyboard.CreateBuildingKeyboard()
 	case cst.Back:
-		msg, err := HandleBack(userRepo, update.Message.Chat.ID, state)
+		msg, err := HandleBackCom(userRepo, update.Message.Chat.ID, state)
 		if err != nil {
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
 		update.Message.Text = msg
-		HandleUpdate(botApi, update, userRepo, roomRepo)
+		HandleUpdateCom(botApi, update, userRepo, roomRepo)
 	case cst.Menu:
-		responseText, replyMarkup, err = HandleBackToMenu(userRepo, update.Message.Chat.ID)
+		responseText, err = HandleMenuCom(userRepo, update.Message.Chat.ID)
 		if err != nil {
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
+		replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)
 	default:
 		switch state {
 		case "info":
+			// wait for building name
+			// change state to info_number
+			replyMarkup = keyboard.CreateMiniKeyboard(cst.Back)
 		case "info_number":
+			// wait for room number
+			// change state to finish
 		case "search":
+			// wait for building name
+			// change state to search_date
 		case "search_date":
+			// wait for date
+			// change state to search_time
 		case "search_time":
+			// wait for date
+			// change state to search_time
 		case "finish":
+			responseText = cst.CantUnderstand
+			replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)
 		default:
 			responseText = cst.CantUnderstand
 			replyMarkup = keyboard.CreateMainKeyboard()

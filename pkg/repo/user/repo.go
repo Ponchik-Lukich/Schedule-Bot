@@ -6,8 +6,8 @@ import (
 
 type Repository interface {
 	CreateUser(id int64) error
+	UpdateUser(id int64, updates map[string]interface{}) error
 	GetUserState(id int64) (string, error)
-	SetUserState(id int64, state string) error
 }
 
 type repository struct {
@@ -26,6 +26,6 @@ func (r *repository) GetUserState(id int64) (string, error) {
 	return r.storage.GetUserState(id)
 }
 
-func (r *repository) SetUserState(id int64, state string) error {
-	return r.storage.SetUserState(id, state)
+func (r *repository) UpdateUser(id int64, updates map[string]interface{}) error {
+	return r.storage.UpdateUser(id, updates)
 }

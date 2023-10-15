@@ -31,8 +31,8 @@ func (s *Storage) GetUserState(id int64) (string, error) {
 	return state, nil
 }
 
-func (s *Storage) SetUserState(id int64, state string) error {
-	if err := s.db.Table("users").Where("chat_id = ?", id).Update("state", state).Error; err != nil {
+func (s *Storage) UpdateUser(id int64, updates map[string]interface{}) error {
+	if err := s.db.Table("users").Where("chat_id = ?", id).Updates(updates).Error; err != nil {
 		return err
 	}
 
