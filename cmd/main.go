@@ -17,10 +17,11 @@ import (
 	"strings"
 )
 
+// init for serverless function
 func init() {
 	err := LoadConfiguration()
 	if err != nil {
-		log.Fatalf("failed to load configuration: %v", err)
+		log.Printf("failed to load configuration: %v", err)
 	}
 
 	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
@@ -41,17 +42,6 @@ func init() {
 	}
 
 	handlerAdapter = router.SetupRouter(botAPI, repos)
-}
-
-var handlerAdapter *httpadapter.HandlerAdapter
-
-func Handler(ctx context.Context, event *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	fullPath := event.Headers["X-Envoy-Original-Path"]
-	fullPath = strings.Split(fullPath, "?")[0]
-	event.Path = fullPath
-
-	response, err := handlerAdapter.ProxyWithContext(ctx, *event)
-	return &response, err
 }
 
 func LoadConfiguration() error {
@@ -84,12 +74,31 @@ func InitializeStorage() (storage.Storage, error) {
 	return db, nil
 }
 
+var handlerAdapter *httpadapter.HandlerAdapter
+
+// Handler handler for serverless function
+func Handler(ctx context.Context, event *events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
+	fullPath := event.Headers["X-Envoy-Original-Path"]
+	fullPath = strings.Split(fullPath, "?")[0]
+	event.Path = fullPath
+
+	response, err := handlerAdapter.ProxyWithContext(ctx, *event)
+	return &response, err
+}
+
+// local run
 func main() {
 	botToken := os.Getenv("TELEGRAM_BOT_TOKEN")
 	if botToken == "" {
 		log.Fatalf("log token is rquired")
 	}
 	log.Println("Bot token loaded")
+	db, err := InitializeStorage()
+	if err != nil {
+		log.Fatalf("failed to initialize storage: %v", err)
+	}
 
-	bot.RunBotLocal(botToken)
+	repos := repo.NewRepositories(db)
+
+	bot.RunBotLocal(botToken, repos)
 }

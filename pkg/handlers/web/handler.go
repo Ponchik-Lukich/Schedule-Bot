@@ -1,8 +1,8 @@
-package message
+package web
 
 import (
-	"Telegram/pkg/bot"
 	"Telegram/pkg/errors"
+	"Telegram/pkg/handlers/telegram"
 	"Telegram/pkg/repo/room"
 	"Telegram/pkg/repo/user"
 	"encoding/json"
@@ -35,11 +35,10 @@ func (h *handler) HandleUpdate(ctx *gin.Context) {
 	}
 
 	if update.Message.IsCommand() && update.Message.Command() == "start" {
-		// add user
-		return
+		telegram.HandleStart(h.bot, &update, h.userRepo)
+	} else {
+		telegram.HandleUpdate(h.bot, &update, h.userRepo, h.roomRepo)
 	}
-
-	bot.HandleUpdate(h.bot, &update)
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "ok",

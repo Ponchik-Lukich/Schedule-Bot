@@ -1,8 +1,7 @@
 package router
 
 import (
-	"Telegram/pkg/handlers/web/message"
-	"Telegram/pkg/handlers/web/test"
+	"Telegram/pkg/handlers/web"
 	"Telegram/pkg/repo"
 	"github.com/awslabs/aws-lambda-go-api-proxy/httpadapter"
 	"github.com/gin-gonic/gin"
@@ -12,10 +11,9 @@ import (
 func SetupRouter(bot *tgbotapi.BotAPI, repos repo.Repositories) *httpadapter.HandlerAdapter {
 	router := gin.Default()
 
-	messageH := message.NewHandler(bot, repos.GetUserRepo(), repos.GetRoomRepo())
+	messageH := web.NewHandler(bot, repos.GetUserRepo(), repos.GetRoomRepo())
 
 	router.POST("/", messageH.HandleUpdate)
-	router.GET("/", test.Test)
 
 	return httpadapter.New(router)
 }

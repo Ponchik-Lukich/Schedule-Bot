@@ -1,46 +1,13 @@
 package bot
 
 import (
+	"Telegram/pkg/handlers/telegram"
+	"Telegram/pkg/repo"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 )
 
-func HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
-	if update.Message == nil {
-		return
-	}
-
-	var responseText string
-	var replyMarkup tgbotapi.ReplyKeyboardMarkup
-
-	switch update.Message.Text {
-	case "Поиск свободного кабинета":
-		responseText = "Here's the info for free rooms..."
-		replyMarkup = CreateMiniKeyboard("Назад")
-	case "Информация о кабинете":
-		responseText = "Here's the room information..."
-		replyMarkup = CreateMiniKeyboard("Назад")
-	case "Назад":
-		responseText = "Choose an option:"
-		replyMarkup = CreateMainKeyboard()
-	default:
-		responseText = "Choose an option:"
-		replyMarkup = CreateMainKeyboard()
-	}
-
-	replyMarkup.ResizeKeyboard = true
-	replyMarkup.OneTimeKeyboard = true
-
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
-	msg.ReplyMarkup = replyMarkup
-
-	_, err := bot.Send(msg)
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-func RunBotLocal(botToken string) {
+func RunBotLocal(botToken string, repos repo.Repositories) {
 	bot, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
 		log.Fatal(err)
@@ -57,6 +24,10 @@ func RunBotLocal(botToken string) {
 	}
 
 	for update := range updates {
-		HandleUpdate(bot, &update)
+		if update.Message.IsCommand() && update.Message.Command() == "start" {
+			telegram.HandleStart(bot, &update, repos.GetUserRepo())
+			continue
+		}
+		telegram.HandleUpdate(bot, &update, repos.GetUserRepo(), repos.GetRoomRepo())
 	}
 }
