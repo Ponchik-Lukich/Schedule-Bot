@@ -11,7 +11,7 @@ import (
 func SetupRouter(bot *tgbotapi.BotAPI, repos repo.Repositories) *httpadapter.HandlerAdapter {
 	router := gin.Default()
 
-	messageH := web.NewHandler(bot, repos.GetUserRepo(), repos.GetRoomRepo())
+	messageH := web.NewHandler(bot, repos)
 
 	router.POST("/", messageH.HandleUpdate)
 

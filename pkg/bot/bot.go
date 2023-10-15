@@ -25,9 +25,9 @@ func RunBotLocal(botToken string, repos repo.Repositories) {
 
 	for update := range updates {
 		if update.Message.IsCommand() && update.Message.Command() == "start" {
-			commands.HandleStartCom(bot, &update, repos.GetUserRepo())
+			commands.HandleStartCom(bot, &update, repos)
 			continue
 		}
-		commands.HandleUpdateCom(bot, &update, repos.GetUserRepo(), repos.GetRoomRepo())
+		commands.HandleUpdateCom(bot, &update, repos)
 	}
 }

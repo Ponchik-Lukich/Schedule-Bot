@@ -4,14 +4,14 @@ import (
 	"Telegram/pkg/bot/functions"
 	"Telegram/pkg/bot/keyboard"
 	"Telegram/pkg/constants"
-	"Telegram/pkg/repo/user"
+	"Telegram/pkg/repo"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"log"
 )
 
-func HandleStartCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, userRepo user.Repository) {
+func HandleStartCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos repo.Repositories) {
 	chatID := update.Message.Chat.ID
-	err := userRepo.CreateUser(chatID)
+	err := repos.GetUserRepo().CreateUser(chatID)
 	if err != nil {
 		log.Println(err)
 	}

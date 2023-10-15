@@ -2,14 +2,14 @@ package commands
 
 import (
 	"Telegram/pkg/constants"
-	"Telegram/pkg/repo/user"
+	"Telegram/pkg/repo"
 )
 
-func HandleSearchCom(userRepo user.Repository, chatID int64, userState string) (string, error) {
-	updates := map[string]interface{}{
-		"state": "search_building",
+func HandleSearchCom(chatID int64, userState string, repos repo.Repositories) (string, error) {
+	updates := map[string]any{
+		"state": userState,
 	}
-	if err := userRepo.UpdateUser(chatID, updates); err != nil {
+	if err := repos.GetUserRepo().UpdateUser(chatID, updates); err != nil {
 		return "", err
 	}
 	reply := constants.BuildingChoice

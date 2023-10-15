@@ -2,14 +2,14 @@ package commands
 
 import (
 	cst "Telegram/pkg/constants"
-	"Telegram/pkg/repo/user"
+	"Telegram/pkg/repo"
 )
 
-func HandleMenuCom(userRepo user.Repository, chatID int64) (string, error) {
-	updates := map[string]interface{}{
+func HandleMenuCom(chatID int64, repos repo.Repositories) (string, error) {
+	updates := map[string]any{
 		"state": "wait",
 	}
-	if err := userRepo.UpdateUser(chatID, updates); err != nil {
+	if err := repos.GetUserRepo().UpdateUser(chatID, updates); err != nil {
 		return "", err
 	}
 	reply := cst.Choice
@@ -17,7 +17,7 @@ func HandleMenuCom(userRepo user.Repository, chatID int64) (string, error) {
 	return reply, nil
 }
 
-func HandleBackCom(userRepo user.Repository, chatID int64, userState string) (string, error) {
+func HandleBackCom(chatID int64, userState string, repos repo.Repositories) (string, error) {
 	if userState == "finish" {
 		return cst.Menu, nil
 	}
@@ -28,11 +28,11 @@ func HandleBackCom(userRepo user.Repository, chatID int64, userState string) (st
 		userState = "wait"
 	}
 
-	updates := map[string]interface{}{
+	updates := map[string]any{
 		"state": userState,
 	}
 
-	if err := userRepo.UpdateUser(chatID, updates); err != nil {
+	if err := repos.GetUserRepo().UpdateUser(chatID, updates); err != nil {
 		return "", err
 	}
 

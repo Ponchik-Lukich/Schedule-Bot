@@ -3,7 +3,7 @@ package constants
 const (
 	Ydb                 = "ydb"
 	Greeting            = "Привет! Я бот, который поможет тебе найти свободный кабинет в университете."
-	BuildingChoice      = "Выбери корпус: "
+	BuildingChoice      = "Выберите корпус: "
 	Choice              = "Выбери функцию:"
 	Info                = "Информация о кабинете"
 	Search              = "Поиск свободного кабинета"
@@ -12,6 +12,7 @@ const (
 	CantUnderstand      = "Извини, я не понимаю тебя."
 	EnterRoom           = "Введите номер кабинета (число):"
 	BuildingDoesntExist = "Корпуса с таким названием не существует."
+	MapPath             = "assets/images/map.png"
 )
 
 var (

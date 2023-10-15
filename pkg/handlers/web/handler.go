@@ -3,8 +3,7 @@ package web
 import (
 	"Telegram/pkg/errors"
 	"Telegram/pkg/handlers/telegram/commands"
-	"Telegram/pkg/repo/room"
-	"Telegram/pkg/repo/user"
+	"Telegram/pkg/repo"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -16,13 +15,12 @@ type Handler interface {
 }
 
 type handler struct {
-	bot      *tgbotapi.BotAPI
-	roomRepo room.Repository
-	userRepo user.Repository
+	bot   *tgbotapi.BotAPI
+	repos repo.Repositories
 }
 
-func NewHandler(bot *tgbotapi.BotAPI, userRepo user.Repository, roomRepo room.Repository) Handler {
-	return &handler{bot: bot, userRepo: userRepo, roomRepo: roomRepo}
+func NewHandler(bot *tgbotapi.BotAPI, repos repo.Repositories) Handler {
+	return &handler{bot: bot, repos: repos}
 }
 
 func (h *handler) HandleUpdate(ctx *gin.Context) {
@@ -35,9 +33,9 @@ func (h *handler) HandleUpdate(ctx *gin.Context) {
 	}
 
 	if update.Message.IsCommand() && update.Message.Command() == "start" {
-		commands.HandleStartCom(h.bot, &update, h.userRepo)
+		commands.HandleStartCom(h.bot, &update, h.repos)
 	} else {
-		commands.HandleUpdateCom(h.bot, &update, h.userRepo, h.roomRepo)
+		commands.HandleUpdateCom(h.bot, &update, h.repos)
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
