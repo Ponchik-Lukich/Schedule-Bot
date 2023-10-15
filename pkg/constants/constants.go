@@ -13,6 +13,8 @@ const (
 	EnterRoom           = "Введите номер кабинета (число):"
 	BuildingDoesntExist = "Корпуса с таким названием не существует."
 	MapPath             = "assets/images/map.png"
+	RoomInfo            = "Информация о кабинете: "
+	RoomDoesntExist     = "Кабинета с таким номером не существует."
 )
 
 var (
