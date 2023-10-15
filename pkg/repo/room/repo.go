@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	GetRoomInfo(building, number string) []models.Room
+	GetRoomInfo(building, number string) ([]models.Room, error)
 }
 
 type repository struct {
@@ -17,7 +17,13 @@ func NewRepository(storage room.Storage) Repository {
 	return &repository{storage: storage}
 }
 
-func (r *repository) GetRoomInfo(building, number string) []models.Room {
+func (r *repository) GetRoomInfo(building, number string) ([]models.Room, error) {
 	name := building + "-" + number
-	return r.storage.GetRoomInfo(name)
+
+	rooms, err := r.storage.GetRoomInfo(name)
+	if err != nil {
+		return nil, err
+	}
+
+	return rooms, nil
 }

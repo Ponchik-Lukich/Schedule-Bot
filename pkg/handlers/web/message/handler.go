@@ -3,6 +3,8 @@ package message
 import (
 	"Telegram/pkg/bot"
 	"Telegram/pkg/errors"
+	"Telegram/pkg/repo/room"
+	"Telegram/pkg/repo/user"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -14,11 +16,13 @@ type Handler interface {
 }
 
 type handler struct {
-	bot *tgbotapi.BotAPI
+	bot      *tgbotapi.BotAPI
+	roomRepo room.Repository
+	userRepo user.Repository
 }
 
-func NewHandler(bot *tgbotapi.BotAPI) Handler {
-	return &handler{bot: bot}
+func NewHandler(bot *tgbotapi.BotAPI, userRepo user.Repository, roomRepo room.Repository) Handler {
+	return &handler{bot: bot, userRepo: userRepo, roomRepo: roomRepo}
 }
 
 func (h *handler) HandleUpdate(ctx *gin.Context) {

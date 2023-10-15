@@ -2,6 +2,7 @@ package main
 
 import (
 	"Telegram/pkg/bot"
+	"Telegram/pkg/repo"
 	"Telegram/pkg/router"
 	"Telegram/pkg/storage"
 	"Telegram/pkg/storage/ydb"
@@ -27,17 +28,19 @@ func init() {
 		log.Fatalf("log token is rquired")
 	}
 
-	_, err = InitializeStorage()
+	db, err := InitializeStorage()
 	if err != nil {
 		log.Fatalf("failed to initialize storage: %v", err)
 	}
+
+	repos := repo.NewRepositories(db)
 
 	botAPI, err := tgbotapi.NewBotAPI(botToken)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	handlerAdapter = router.SetupRouter(botAPI)
+	handlerAdapter = router.SetupRouter(botAPI, repos)
 }
 
 var handlerAdapter *httpadapter.HandlerAdapter
@@ -74,7 +77,6 @@ func InitializeStorage() (storage.Storage, error) {
 		return nil, fmt.Errorf("failed to initialize database: %w", err)
 	}
 
-	fmt.Println("Connecting to database")
 	if err := db.Connect(); err != nil {
 		return nil, fmt.Errorf("failed to connect to database: %w", err)
 	}

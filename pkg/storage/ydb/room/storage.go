@@ -13,15 +13,13 @@ func NewStorage(db *gorm.DB) *Storage {
 	return &Storage{db: db}
 }
 
-func (s *Storage) Init() *gorm.DB {
-	return s.db
-}
-
-func (s *Storage) GetRoomInfo(name string) []models.Room {
+func (s *Storage) GetRoomInfo(name string) ([]models.Room, error) {
 	var rooms []models.Room
 
-	db := s.Init()
-	db.Where("name like ?", name+"%").Find(&rooms)
+	err := s.db.Where("name like ?", name+"%").Find(&rooms).Error
+	if err != nil {
+		return nil, err
+	}
 
-	return rooms
+	return rooms, nil
 }

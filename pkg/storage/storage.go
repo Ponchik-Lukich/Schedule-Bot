@@ -3,9 +3,9 @@ package storage
 import (
 	"Telegram/pkg/constants"
 	errorsMes "Telegram/pkg/errors"
+	"Telegram/pkg/storage/room"
+	"Telegram/pkg/storage/user"
 	"Telegram/pkg/storage/ydb"
-	"Telegram/pkg/storage/ydb/room"
-	"Telegram/pkg/storage/ydb/user"
 	"errors"
 	"gorm.io/gorm"
 )
