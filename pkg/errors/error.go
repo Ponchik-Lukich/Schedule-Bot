@@ -6,6 +6,9 @@ var (
 	InvalidJson             = "ERROR_UNMARSHALLING_MESSAGE"
 	InvalidConfig           = "ERROR_INVALID_CONFIG"
 	UnsupportedDatabaseType = "ERROR_UNSUPPORTED_DATABASE_TYPE"
+	ErrorGettingUserState   = "ERROR_GETTING_USER_State"
+	ErrorSettingUserState   = "ERROR_SETTING_USER_State"
+	ErrorSendingMessage     = "ERROR_SENDING_MESSAGE"
 )
 
 func HandleError(ctx *gin.Context, status int, errMsg string, err error) {
