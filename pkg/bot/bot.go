@@ -5,48 +5,21 @@ import (
 	"log"
 )
 
-func CreateMainKeyboard() tgbotapi.ReplyKeyboardMarkup {
-	keyboard := tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("Поиск свободного кабинета"),
-		),
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("Информация о кабинете"),
-		),
-	)
-	keyboard.ResizeKeyboard = true
-	keyboard.OneTimeKeyboard = true
-
-	return keyboard
-}
-
-func CreateMiniKeyboard() tgbotapi.ReplyKeyboardMarkup {
-	keyboard := tgbotapi.NewReplyKeyboard(
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("Назад"),
-		),
-	)
-	keyboard.ResizeKeyboard = true
-	keyboard.OneTimeKeyboard = true
-
-	return keyboard
-}
-
 func HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 	if update.Message == nil {
 		return
 	}
 
 	var responseText string
-	var replyMarkup interface{}
+	var replyMarkup tgbotapi.ReplyKeyboardMarkup
 
 	switch update.Message.Text {
 	case "Поиск свободного кабинета":
 		responseText = "Here's the info for free rooms..."
-		replyMarkup = CreateMiniKeyboard()
+		replyMarkup = CreateMiniKeyboard("Назад")
 	case "Информация о кабинете":
 		responseText = "Here's the room information..."
-		replyMarkup = CreateMiniKeyboard()
+		replyMarkup = CreateMiniKeyboard("Назад")
 	case "Назад":
 		responseText = "Choose an option:"
 		replyMarkup = CreateMainKeyboard()
@@ -54,6 +27,9 @@ func HandleUpdate(bot *tgbotapi.BotAPI, update *tgbotapi.Update) {
 		responseText = "Choose an option:"
 		replyMarkup = CreateMainKeyboard()
 	}
+
+	replyMarkup.ResizeKeyboard = true
+	replyMarkup.OneTimeKeyboard = true
 
 	msg := tgbotapi.NewMessage(update.Message.Chat.ID, responseText)
 	msg.ReplyMarkup = replyMarkup

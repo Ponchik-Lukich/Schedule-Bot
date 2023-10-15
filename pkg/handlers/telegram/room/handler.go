@@ -2,15 +2,9 @@ package room
 
 import (
 	"Telegram/pkg/repo/room"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-type Handler interface {
-}
+func AddUser(bot *tgbotapi.BotAPI, roomRepo room.Repository) {
 
-type handler struct {
-	repo room.Repository
-}
-
-func NewHandler(repo room.Repository) Handler {
-	return &handler{repo: repo}
 }

@@ -34,6 +34,11 @@ func (h *handler) HandleUpdate(ctx *gin.Context) {
 		return
 	}
 
+	if update.Message.IsCommand() && update.Message.Command() == "start" {
+		// add user
+		return
+	}
+
 	bot.HandleUpdate(h.bot, &update)
 
 	ctx.JSON(http.StatusOK, gin.H{

@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	GetRoomInfo(building, number string) ([]models.Room, error)
+	//GetFreeRooms(building, hasDot, hasProjector, date, interval string) ([]models.Room, error)
 }
 
 type repository struct {
@@ -18,7 +19,10 @@ func NewRepository(storage room.Storage) Repository {
 }
 
 func (r *repository) GetRoomInfo(building, number string) ([]models.Room, error) {
-	name := building + "-" + number
+	name := ""
+	if building != "" {
+		name = building + "-" + number
+	}
 
 	rooms, err := r.storage.GetRoomInfo(name)
 	if err != nil {
@@ -27,3 +31,12 @@ func (r *repository) GetRoomInfo(building, number string) ([]models.Room, error)
 
 	return rooms, nil
 }
+
+//func (r *repository) GetFreeRooms(building, hasDot, hasProjector string) ([]models.Room, error) {
+//	rooms, err := r.storage.GetFreeRooms(building, hasDot, hasProjector)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	return rooms, nil
+//}
