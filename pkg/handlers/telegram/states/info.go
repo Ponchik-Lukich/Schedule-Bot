@@ -3,7 +3,6 @@ package states
 import (
 	cst "Telegram/pkg/constants"
 	"Telegram/pkg/repo"
-	"strings"
 )
 
 func HandleInfoState(chatID int64, building string, repos repo.Repositories) (string, bool, error) {
@@ -24,28 +23,26 @@ func HandleInfoState(chatID int64, building string, repos repo.Repositories) (st
 }
 
 func HandleInfoNumberState(chatID int64, number string, repos repo.Repositories) (string, bool, error) {
-	room, err := repos.GetRoomRepo().GetRoomInfo(number)
+	user, err := repos.GetUserRepo().GetUser(chatID)
 	if err != nil {
 		return "", false, err
 	}
 
-	if room == nil {
-		return cst.RoomDoesntExist, false, nil
-	}
+	building := user.SavedBuilding
 
-	var res strings.Builder
-	res.WriteString(cst.RoomInfo + "\n")
-	for _, r := range room {
-		res.WriteString(r.String() + "\n")
+	res, err := repos.GetRoomRepo().GetRoomInfo(number, *building)
+	if err != nil {
+		return "", false, err
 	}
 
 	updates := map[string]any{
-		"state": "finish",
+		"state":          "finish",
+		"saved_building": nil,
 	}
 
 	if err := repos.GetUserRepo().UpdateUser(chatID, updates); err != nil {
 		return "", false, err
 	}
 
-	return res.String(), true, nil
+	return res, true, nil
 }

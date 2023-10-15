@@ -21,14 +21,14 @@ func (s *Storage) CreateUser(id int64) error {
 	return nil
 }
 
-func (s *Storage) GetUserState(id int64) (string, error) {
-	var state string
+func (s *Storage) GetUser(id int64) (models.User, error) {
+	var user models.User
 
-	if err := s.db.Table("users").Where("chat_id = ?", id).Select("state").Scan(&state).Error; err != nil {
-		return "", err
+	if err := s.db.Table("users").Where("chat_id = ?", id).Select("state").Scan(&user).Error; err != nil {
+		return models.User{}, err
 	}
 
-	return state, nil
+	return user, nil
 }
 
 func (s *Storage) UpdateUser(id int64, updates map[string]any) error {

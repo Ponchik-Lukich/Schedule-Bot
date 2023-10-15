@@ -16,11 +16,12 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 	chatID, msgText := update.Message.Chat.ID, update.Message.Text
 	next, photo := false, false
 
-	state, err := repos.GetUserRepo().GetUserState(chatID)
+	user, err := repos.GetUserRepo().GetUser(chatID)
 	if err != nil {
 		errors.LogError(errors.ErrorGettingUserState, err)
 		return
 	}
+	state := user.State
 
 	switch msgText {
 	case cst.Search:
