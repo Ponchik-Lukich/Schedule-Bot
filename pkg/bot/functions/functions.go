@@ -1,21 +1,29 @@
 package functions
 
 import (
-	"Telegram/pkg/errors"
-	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func SendMessage(botApi *tgbotapi.BotAPI, replyMarkup tgbotapi.ReplyKeyboardMarkup, chatID int64, text string) error {
-	replyMarkup.ResizeKeyboard = true
-	replyMarkup.OneTimeKeyboard = true
+func SendMessage(botApi *tgbotapi.BotAPI, buttons tgbotapi.ReplyKeyboardMarkup, chatID int64, text string) error {
+	buttons.ResizeKeyboard = true
+	buttons.OneTimeKeyboard = true
 
 	msg := tgbotapi.NewMessage(chatID, text)
-	msg.ReplyMarkup = replyMarkup
+	msg.ReplyMarkup = buttons
 
 	_, err := botApi.Send(msg)
 	if err != nil {
-		return fmt.Errorf("%s: %v", errors.ErrorSendingMessage, err)
+		return err
 	}
+	return nil
+}
+
+func SendPhoto(botApi *tgbotapi.BotAPI, chatID int64, imagePath string) error {
+	photo := tgbotapi.NewPhotoUpload(chatID, imagePath)
+	_, err := botApi.Send(photo)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

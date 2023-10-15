@@ -1,6 +1,9 @@
 package errors
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"github.com/gin-gonic/gin"
+)
 
 var (
 	InvalidJson             = "ERROR_UNMARSHALLING_MESSAGE"
@@ -21,4 +24,8 @@ func HandleError(ctx *gin.Context, status int, errMsg string, err error) {
 	}
 
 	ctx.JSON(status, response)
+}
+
+func LogError(errType string, err error) string {
+	return fmt.Sprintf("%s: %v", errType, err)
 }
