@@ -52,7 +52,7 @@ func (l Lesson) String() string {
 
 	var dateRangeString string
 	if l.DateFrom != nil && l.DateTo != nil {
-		dateRangeString = fmt.Sprintf("%s (%s - %s)", cst.Emoji["Sch"], l.DateFrom.Format("02.01.2006"),
+		dateRangeString = fmt.Sprintf("%s (%s - %s)\n", cst.Emoji["Sch"], l.DateFrom.Format("02.01.2006"),
 			l.DateTo.Format("02.01.2006"))
 	}
 

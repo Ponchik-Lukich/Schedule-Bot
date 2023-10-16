@@ -40,10 +40,14 @@ func (r RoomInfoDto) String() string {
 	}
 
 	b.WriteString(fmt.Sprintf("%s %s: %s\n\n", cst.Emoji["Room"], cst.Info, r.RoomName))
-	b.WriteString(fmt.Sprintf("%s: %s\n", cst.Emoji["Ava"], available))
-	b.WriteString(fmt.Sprintf("%s: %s\n\n", cst.Emoji["Proj"], projector))
-	b.WriteString(fmt.Sprintf("%s\n\n", cst.Schedule))
+	b.WriteString(fmt.Sprintf("%s: %s     %s: %s\n", cst.Emoji["Ava"], available, cst.Emoji["Proj"], projector))
+
+	currentDay := -1
 	for _, lesson := range r.Lessons {
+		if lesson.WeekDay != currentDay {
+			b.WriteString(fmt.Sprintf("%s\n\n", cst.Days[lesson.WeekDay]))
+			currentDay = lesson.WeekDay
+		}
 		b.WriteString(fmt.Sprintf("%s\n", lesson.String()))
 	}
 
