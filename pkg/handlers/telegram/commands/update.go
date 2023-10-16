@@ -8,6 +8,7 @@ import (
 	"Telegram/pkg/handlers/telegram/states"
 	"Telegram/pkg/repo"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"log"
 )
 
 func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos repo.Repositories) {
@@ -22,6 +23,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 		return
 	}
 	state := user.State
+	log.Println(state, msgText)
 
 	switch msgText {
 	case cst.Search:
@@ -46,7 +48,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
-		msgText = msg
+		update.Message.Text = msg
 		HandleUpdateCom(botApi, update, repos)
 	case cst.Menu:
 		responseText, err = HandleMenuCom(chatID, repos)

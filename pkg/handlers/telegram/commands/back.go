@@ -22,7 +22,7 @@ func HandleBackCom(chatID int64, userState string, repos repo.Repositories) (str
 		return cst.Menu, nil
 	}
 
-	if newState, ok := cst.NumberStates[cst.StatesNumber[userState]-1]; !ok {
+	if newState, ok := cst.NumberStates[cst.StatesNumber[userState]-1]; ok {
 		userState = newState
 	} else {
 		userState = "wait"

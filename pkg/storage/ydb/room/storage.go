@@ -25,14 +25,17 @@ func NewStorage(db *gorm.DB) *Storage {
 //	return rooms, nil
 //}
 
-func (s *Storage) GetRoomInfo(name string) (models.RoomInfoDto, error) {
+func (s *Storage) GetRoomInfo(name, building string) (models.RoomInfoDto, error) {
 	var room models.Room
 	var roomInfo models.RoomInfoDto
 
-	err := s.db.Where("name LIKE ?", name+"%").First(&room).Error
+	err := s.db.Where("building = ?", building).Where("name = ?", name).First(&room).Error
 	if err != nil {
-		fmt.Println("AAAAAAAAAAAAA")
-		return models.RoomInfoDto{}, err
+		if err == gorm.ErrRecordNotFound {
+			return models.RoomInfoDto{}, nil
+		} else {
+			return models.RoomInfoDto{}, err
+		}
 	}
 
 	var lessons []models.Lesson
@@ -65,11 +68,33 @@ func (s *Storage) GetRoomInfo(name string) (models.RoomInfoDto, error) {
 	}
 
 	roomInfo = models.RoomInfoDto{
-		RoomName:       room.Name,
-		IsAvailability: room.IsAvailable,
-		HasProjector:   room.HasProjector,
-		Lessons:        lessonInfos,
+		RoomName:     room.Name,
+		IsAvailable:  room.IsAvailable,
+		HasProjector: room.HasProjector,
+		Lessons:      lessonInfos,
 	}
 
 	return roomInfo, nil
+}
+
+func (s *Storage) GetRoomsByName(building, name string) ([]string, error) {
+	var rooms []models.Room
+	var roomNames []string
+
+	fmt.Println(name, building)
+	err := s.db.Table("rooms").Where("building = ?", building).Where("name LIKE ?", name+"%").Scan(&rooms).Error
+	fmt.Println(len(rooms))
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		} else {
+			return nil, err
+		}
+	}
+
+	for _, r := range rooms {
+		roomNames = append(roomNames, r.Name)
+	}
+
+	return roomNames, nil
 }

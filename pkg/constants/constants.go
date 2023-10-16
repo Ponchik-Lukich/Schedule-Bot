@@ -10,11 +10,18 @@ const (
 	Menu                = "Вернуться в главное меню"
 	Back                = "Назад"
 	CantUnderstand      = "Извини, я не понимаю тебя."
-	EnterRoom           = "Введите номер кабинета (число):"
+	EnterRoom           = "Введите номер кабинета:"
 	BuildingDoesntExist = "Корпуса с таким названием не существует."
 	MapPath             = "assets/images/map.png"
 	RoomInfo            = "Информация о кабинете: "
 	RoomDoesntExist     = "Кабинета с таким номером не существует."
+	RoomPattern         = `^(|.*\D)число(|\D.*)$`
+	RoomsFound          = "Найдено несколько кабинетов! \nПожалуйста, уточните номер кабинета:"
+	IsAvailable         = "Возможность занять:"
+	No                  = "Нет"
+	Yes                 = "Да"
+	Schedule            = "Расписание:"
+	Projector           = "Наличие проектора:"
 )
 
 var (
