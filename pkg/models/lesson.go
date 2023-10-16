@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -21,4 +23,16 @@ type Lesson struct {
 	Tutors   []Tutor    `json:"tutors" gorm:"many2many:lessons_tutors;constraint:OnDelete:CASCADE"`
 	Room     Room       `json:"room"`
 	RoomID   string
+}
+
+type LessonInfoDto struct {
+	TimeFrom   time.Time
+	TimeTo     time.Time
+	TutorNames []string
+	GroupNames []string
+}
+
+func (l LessonInfoDto) String() string {
+	return fmt.Sprintf("Time: %s - %s\nTutors: %s\nGroups: %s\n", l.TimeFrom.Format("15:04"),
+		l.TimeTo.Format("15:04"), strings.Join(l.TutorNames, ", "), strings.Join(l.GroupNames, ", "))
 }

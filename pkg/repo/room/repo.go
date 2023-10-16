@@ -3,7 +3,6 @@ package room
 import (
 	cst "Telegram/pkg/constants"
 	"Telegram/pkg/storage/room"
-	"strings"
 )
 
 type Repository interface {
@@ -22,21 +21,17 @@ func NewRepository(storage room.Storage) Repository {
 func (r *repository) GetRoomInfo(building, number string) (string, error) {
 	name := building + "-" + number
 
-	rooms, err := r.storage.GetRoomInfo(name)
+	roomInfo, err := r.storage.GetRoomInfo(name)
 	if err != nil {
 		return "", err
 	}
-	if len(rooms) == 0 {
+	res := roomInfo.String()
+
+	if res == "" {
 		return cst.RoomDoesntExist, nil
 	}
 
-	var res strings.Builder
-	res.WriteString(cst.RoomInfo + "\n")
-	for _, r := range rooms {
-		res.WriteString(r.String() + "\n")
-	}
-
-	return res.String(), nil
+	return res, nil
 }
 
 //func (r *repository) GetFreeRooms(building, hasDot, hasProjector string) ([]models.Room, error) {
