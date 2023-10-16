@@ -36,7 +36,7 @@ func (r RoomInfoDto) String() string {
 		projector = cst.Yes
 	}
 
-	b.WriteString(fmt.Sprintf("%s\n", cst.RoomInfo))
+	b.WriteString(fmt.Sprintf("%s:", cst.Info))
 	b.WriteString(fmt.Sprintf("%s\n", r.RoomName))
 	b.WriteString(fmt.Sprintf("%s %v\n", cst.IsAvailable, available))
 	b.WriteString(fmt.Sprintf("%s %v\n", cst.Projector, projector))
