@@ -23,24 +23,26 @@ type RoomInfoDto struct {
 	RoomName     string
 	IsAvailable  bool
 	HasProjector bool
-	Lessons      []LessonInfoDto
+	Lessons      []Lesson
 }
 
 func (r RoomInfoDto) String() string {
 	var b strings.Builder
-	available, projector := cst.No, cst.No
+
+	sortLessons(r.Lessons)
+
+	available, projector := cst.Emoji["No"], cst.Emoji["No"]
 	if r.IsAvailable {
-		available = cst.Yes
+		available = cst.Emoji["Yes"]
 	}
 	if r.HasProjector {
-		projector = cst.Yes
+		projector = cst.Emoji["Yes"]
 	}
 
-	b.WriteString(fmt.Sprintf("%s:", cst.Info))
-	b.WriteString(fmt.Sprintf("%s\n", r.RoomName))
-	b.WriteString(fmt.Sprintf("%s %v\n", cst.IsAvailable, available))
-	b.WriteString(fmt.Sprintf("%s %v\n", cst.Projector, projector))
-	b.WriteString(fmt.Sprintf("%s\n", cst.Schedule))
+	b.WriteString(fmt.Sprintf("%s %s: %s\n\n", cst.Emoji["Room"], cst.Info, r.RoomName))
+	b.WriteString(fmt.Sprintf("%s: %s\n", cst.Emoji["Ava"], available))
+	b.WriteString(fmt.Sprintf("%s: %s\n\n", cst.Emoji["Proj"], projector))
+	b.WriteString(fmt.Sprintf("%s\n\n", cst.Schedule))
 	for _, lesson := range r.Lessons {
 		b.WriteString(fmt.Sprintf("%s\n", lesson.String()))
 	}

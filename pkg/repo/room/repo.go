@@ -22,7 +22,7 @@ func NewRepository(storage room.Storage) Repository {
 func (r *repository) GetRoomInfo(building, number string) (string, bool, error) {
 	name := strings.Split(building, " ")[1] + "-" + number
 
-	roomNames, err := r.storage.GetRoomsByName(building, name)
+	roomNames, err := r.storage.GetRoomsByName(name)
 	if err != nil {
 		return "", false, err
 	}

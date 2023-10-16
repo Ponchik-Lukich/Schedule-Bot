@@ -1,8 +1,9 @@
 package models
 
 import (
+	cst "Telegram/pkg/constants"
 	"fmt"
-	"strings"
+	"sort"
 	"time"
 )
 
@@ -25,14 +26,44 @@ type Lesson struct {
 	RoomID   string     `json:"room_id" gorm:"index"`
 }
 
-type LessonInfoDto struct {
-	TimeFrom   time.Time
-	TimeTo     time.Time
-	TutorNames []string
-	GroupNames []string
+func (l Lesson) String() string {
+	timeFrom := l.TimeFrom.Format("15:04")
+	timeTo := l.TimeTo.Format("15:04")
+	lessonType := ""
+	switch l.Type {
+	case "Лек":
+		lessonType = cst.Emoji["Lec"]
+	case "Лаб":
+		lessonType = cst.Emoji["Lab"]
+	case "Пр":
+		lessonType = cst.Emoji["Pra"]
+	case "Ауд":
+		lessonType = cst.Emoji["Ayd"]
+	case "Резерв":
+		lessonType = cst.Emoji["Rez"]
+	}
+
+	lessonDetails := fmt.Sprintf("%s %s - %s  %s %s %s", cst.Emoji["Time"], timeFrom, timeTo, lessonType, l.Type, l.Subject)
+
+	var tutorsString string
+	for _, tutor := range l.Tutors {
+		tutorsString += tutor.ShortName + " "
+	}
+
+	var dateRangeString string
+	if l.DateFrom != nil && l.DateTo != nil {
+		dateRangeString = fmt.Sprintf("%s (%s - %s)", cst.Emoji["Sch"], l.DateFrom.Format("02.01.2006"),
+			l.DateTo.Format("02.01.2006"))
+	}
+
+	return fmt.Sprintf("%s\n%s %s\n%s", lessonDetails, cst.Emoji["Tut"], tutorsString, dateRangeString)
 }
 
-func (l LessonInfoDto) String() string {
-	return fmt.Sprintf("Время: %s - %s\nПреподаватели: %s\nГруппы: %s\n", l.TimeFrom.Format("15:04"),
-		l.TimeTo.Format("15:04"), strings.Join(l.TutorNames, ", "), strings.Join(l.GroupNames, ", "))
+func sortLessons(lessons []Lesson) {
+	sort.Slice(lessons, func(i, j int) bool {
+		if lessons[i].WeekDay == lessons[j].WeekDay {
+			return lessons[i].TimeFrom.Before(lessons[j].TimeFrom)
+		}
+		return lessons[i].WeekDay < lessons[j].WeekDay
+	})
 }

@@ -41,50 +41,27 @@ func (s *Storage) GetRoomInfo(name, building string) (models.RoomInfoDto, error)
 	}
 
 	var lessons []models.Lesson
-	var lessonInfos []models.LessonInfoDto
 
 	err = s.db.Preload("Tutors").Preload("Groups").Where("room_id = ?", room.ID).Order("week_day, time_from").Find(&lessons).Error
 	if err != nil {
 		return models.RoomInfoDto{}, err
 	}
 
-	for _, lesson := range lessons {
-		groupNames := make([]string, len(lesson.Groups))
-		for i, group := range lesson.Groups {
-			groupNames[i] = group.Name
-		}
-
-		tutorNames := make([]string, len(lesson.Tutors))
-		for i, tutor := range lesson.Tutors {
-			tutorNames[i] = tutor.ShortName
-		}
-
-		lessonInfo := models.LessonInfoDto{
-			TimeFrom:   lesson.TimeFrom,
-			TimeTo:     lesson.TimeTo,
-			TutorNames: tutorNames,
-			GroupNames: groupNames,
-		}
-
-		lessonInfos = append(lessonInfos, lessonInfo)
-	}
-
 	roomInfo = models.RoomInfoDto{
 		RoomName:     room.Name,
 		IsAvailable:  room.IsAvailable,
 		HasProjector: room.HasProjector,
-		Lessons:      lessonInfos,
+		Lessons:      lessons,
 	}
 
 	return roomInfo, nil
 }
 
-func (s *Storage) GetRoomsByName(building, name string) ([]string, error) {
+func (s *Storage) GetRoomsByName(name string) ([]string, error) {
 	var rooms []models.Room
 	var roomNames []string
 	pattern := strings.Replace(cst.RoomPattern, "number", name, 1)
 
-	fmt.Println(name, building, pattern)
 	err := s.db.Table("rooms").Where("Re2::Match(?)(name)", pattern).Scan(&rooms).Error
 	fmt.Println(len(rooms))
 	if err != nil {
