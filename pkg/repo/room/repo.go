@@ -3,7 +3,6 @@ package room
 import (
 	cst "Telegram/pkg/constants"
 	"Telegram/pkg/storage/room"
-	"regexp"
 	"strings"
 )
 
@@ -22,7 +21,6 @@ func NewRepository(storage room.Storage) Repository {
 
 func (r *repository) GetRoomInfo(building, number string) (string, bool, error) {
 	name := strings.Split(building, " ")[1] + "-" + number
-	newNames := make([]string, 0)
 
 	roomNames, err := r.storage.GetRoomsByName(building, name)
 	if err != nil {
@@ -33,18 +31,9 @@ func (r *repository) GetRoomInfo(building, number string) (string, bool, error) 
 	}
 
 	if len(roomNames) > 1 {
-		for _, roomName := range roomNames {
-			r, _ := regexp.Compile(cst.RoomPattern)
-			if r.MatchString(roomName) {
-				newNames = append(newNames, roomName)
-			}
-		}
-	}
-
-	if len(newNames) > 1 {
 		var res strings.Builder
 		res.WriteString(cst.RoomsFound)
-		for _, name := range newNames {
+		for _, name := range roomNames {
 			res.WriteString(name + "\n")
 		}
 		return res.String(), false, nil

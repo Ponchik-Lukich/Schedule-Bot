@@ -1,9 +1,11 @@
 package room
 
 import (
+	cst "Telegram/pkg/constants"
 	"Telegram/pkg/models"
 	"fmt"
 	"gorm.io/gorm"
+	"strings"
 )
 
 type Storage struct {
@@ -80,9 +82,10 @@ func (s *Storage) GetRoomInfo(name, building string) (models.RoomInfoDto, error)
 func (s *Storage) GetRoomsByName(building, name string) ([]string, error) {
 	var rooms []models.Room
 	var roomNames []string
+	pattern := strings.Replace(cst.RoomPattern, "number", name, 1)
 
-	fmt.Println(name, building)
-	err := s.db.Table("rooms").Where("building = ?", building).Where("name LIKE ?", name+"%").Scan(&rooms).Error
+	fmt.Println(name, building, pattern)
+	err := s.db.Table("rooms").Where("Re2::Match(?)(name)", pattern).Scan(&rooms).Error
 	fmt.Println(len(rooms))
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

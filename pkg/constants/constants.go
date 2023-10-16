@@ -14,7 +14,7 @@ const (
 	BuildingDoesntExist = "Корпуса с таким названием не существует."
 	MapPath             = "assets/images/map.png"
 	RoomDoesntExist     = "Кабинета с таким номером не существует."
-	RoomPattern         = `^(|.*\D)число(|\D.*)$`
+	RoomPattern         = `^(|.*\D)number(|\D.*)$`
 	RoomsFound          = "Найдено несколько кабинетов! \nПожалуйста, уточните номер кабинета:"
 	IsAvailable         = "Возможность занять:"
 	No                  = "Нет"
