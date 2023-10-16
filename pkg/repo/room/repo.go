@@ -26,8 +26,7 @@ func (r *repository) GetRoomInfo(building, number string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	if rooms == nil {
+	if len(rooms) == 0 {
 		return cst.RoomDoesntExist, nil
 	}
 

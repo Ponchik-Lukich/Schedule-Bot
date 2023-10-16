@@ -54,7 +54,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
-		replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)
+		replyMarkup = keyboard.CreateMainKeyboard()
 	default:
 		switch state {
 		case "info":
@@ -69,8 +69,6 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 				replyMarkup = keyboard.CreateMiniKeyboard(cst.Back)
 			}
 		case "info_number":
-			// wait for room number
-			// change state to finish
 			responseText, next, err = states.HandleInfoNumberState(chatID, msgText, repos)
 			if err != nil {
 				errors.LogError(errors.ErrorUpdatingUser, err)

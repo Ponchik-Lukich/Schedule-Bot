@@ -24,7 +24,7 @@ func (s *Storage) CreateUser(id int64) error {
 func (s *Storage) GetUser(id int64) (models.User, error) {
 	var user models.User
 
-	if err := s.db.Table("users").Where("chat_id = ?", id).Select("state").Scan(&user).Error; err != nil {
+	if err := s.db.Table("users").Where("chat_id = ?", id).Scan(&user).Error; err != nil {
 		return models.User{}, err
 	}
 
