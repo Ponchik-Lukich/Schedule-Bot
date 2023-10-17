@@ -71,46 +71,10 @@ func (s *Storage) GetRoomsByName(name string) ([]string, error) {
 	return roomNames, nil
 }
 
-//func (s *Storage) GetFreeRooms(building, date, timeStr string) ([]models.FreeRoomDto, error) {
-//	var conflictingLessons []models.Lesson
-//	defaultDateTime := "2020-01-01T" + timeStr + ":00.000000Z"
-//	timeValue, _ := time.Parse(time.RFC3339, defaultDateTime)
-//
-//	err := s.db.Joins("JOIN rooms ON lessons.room_id = rooms.id").
-//		Where("time_from <= ? AND time_to >= ?", timeValue, timeValue).
-//		Where("rooms.building = ?", building).
-//		Find(&conflictingLessons).Error
-//	if err != nil && err != gorm.ErrRecordNotFound {
-//		return nil, err
-//	}
-//
-//	var conflictingRoomIDs []string
-//	for _, lesson := range conflictingLessons {
-//		conflictingRoomIDs = append(conflictingRoomIDs, lesson.RoomID)
-//	}
-//	fmt.Println(len(conflictingLessons))
-//
-//	var availableRooms []models.Room
-//	err = s.db.Table("rooms").Where("building = ?", building).Not("id IN ?", conflictingRoomIDs).Find(&availableRooms).Error
-//	if err != nil && err != gorm.ErrRecordNotFound {
-//		return nil, err
-//	}
-//
-//	var freeRooms []models.FreeRoomDto
-//	for _, room := range availableRooms {
-//		freeRooms = append(freeRooms, models.FreeRoomDto{
-//			Building: room.Building,
-//			RoomName: room.Name,
-//			Interval: fmt.Sprintf("%s - next lesson time", timeStr),
-//		})
-//	}
-//
-//	return freeRooms, nil
-//}
-
 func (s *Storage) GetFreeRooms(building string, day, week int, timeStr string) ([]models.FreeRoomDto, error) {
 	defaultDateTime := "2020-01-01T" + timeStr + ":00.000000Z"
 	timeValue, _ := time.Parse(time.RFC3339, defaultDateTime)
+	timeValue = timeValue.Add(-3 * time.Hour)
 
 	var roomsInBuilding []models.Room
 	err := s.db.Where("building = ?", building).Find(&roomsInBuilding).Error
@@ -132,23 +96,63 @@ func (s *Storage) GetFreeRooms(building string, day, week int, timeStr string) (
 			return nil, err
 		}
 
-		var prevEndTime time.Time
-		for _, lesson := range lessonsInRoom {
-			if !prevEndTime.IsZero() && prevEndTime.Before(lesson.TimeFrom) && prevEndTime.Before(timeValue) && lesson.TimeFrom.After(timeValue) {
-				freeRooms = append(freeRooms, models.FreeRoomDto{
-					Building: room.Building,
-					RoomName: room.Name,
-					Interval: fmt.Sprintf("%s-%s", prevEndTime.Format("15:04"), lesson.TimeFrom.Format("15:04")),
-				})
-			}
-			prevEndTime = lesson.TimeTo
-		}
-
-		if (len(lessonsInRoom) == 0) || (prevEndTime.Before(timeValue)) {
+		if len(lessonsInRoom) == 0 {
 			freeRooms = append(freeRooms, models.FreeRoomDto{
 				Building: room.Building,
 				RoomName: room.Name,
-				Interval: fmt.Sprintf("%s-∞", prevEndTime.Format("15:04")),
+				Interval: fmt.Sprintf("8:30 - 21:00"),
+			})
+			continue
+		}
+
+		if len(lessonsInRoom) == 1 {
+			if timeValue.Before(lessonsInRoom[0].TimeFrom) {
+				freeRooms = append(freeRooms, models.FreeRoomDto{
+					Building: room.Building,
+					RoomName: room.Name,
+					Interval: fmt.Sprintf("8:30 - %s", lessonsInRoom[0].TimeFrom.Format("15:04")),
+				})
+				break
+			} else if timeValue.After(lessonsInRoom[0].TimeTo) {
+				freeRooms = append(freeRooms, models.FreeRoomDto{
+					Building: room.Building,
+					RoomName: room.Name,
+					Interval: fmt.Sprintf("%s - 21:00", lessonsInRoom[0].TimeTo.Format("15:04")),
+				})
+				break
+			} else {
+				continue
+			}
+		}
+
+		prevTime := ""
+		for _, lesson := range lessonsInRoom {
+			fmt.Println(lesson.TimeFrom, lesson.TimeTo, timeValue)
+			if timeValue.After(lesson.TimeFrom) && timeValue.Before(lesson.TimeTo) {
+				fmt.Println("in lesson")
+				break
+			}
+			if timeValue.After(lesson.TimeTo) {
+				prevTime = lesson.TimeTo.Format("15:04")
+				fmt.Println("prev added")
+			}
+
+			if timeValue.Before(lesson.TimeFrom) && prevTime != "" {
+				fmt.Println("time added")
+				freeRooms = append(freeRooms, models.FreeRoomDto{
+					Building: room.Building,
+					RoomName: room.Name,
+					Interval: fmt.Sprintf("%s - %s", prevTime, lesson.TimeFrom.Format("15:04")),
+				})
+				break
+			}
+		}
+		if prevTime != "" && timeValue.After(lessonsInRoom[len(lessonsInRoom)-1].TimeTo) {
+			fmt.Println("after added")
+			freeRooms = append(freeRooms, models.FreeRoomDto{
+				Building: room.Building,
+				RoomName: room.Name,
+				Interval: fmt.Sprintf("%s - 21:00", prevTime),
 			})
 		}
 	}

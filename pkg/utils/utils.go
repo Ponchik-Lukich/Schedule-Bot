@@ -28,8 +28,5 @@ func GetWeekDay(date string) int {
 	year := time.Now().Year()
 	date = fmt.Sprintf("%d-%s", year, date)
 	t, _ := time.Parse(cst.FullDateLayout, date)
-	if t.Weekday() == 0 {
-		return 6
-	}
-	return int(t.Weekday()) - 1
+	return int(t.Weekday())
 }
