@@ -9,7 +9,7 @@ import (
 
 type Repository interface {
 	GetRoomInfo(building, number string) (string, bool, error)
-	//GetFreeRooms(building, hasDot, hasProjector, date, interval string) ([]models.Room, error)
+	GetFreeRooms(building, date, time string) (string, error)
 }
 
 type repository struct {
@@ -49,11 +49,21 @@ func (r *repository) GetRoomInfo(building, number string) (string, bool, error) 
 	return res, true, nil
 }
 
-//func (r *repository) GetFreeRooms(building, hasDot, hasProjector string) ([]models.Room, error) {
-//	rooms, err := r.storage.GetFreeRooms(building, hasDot, hasProjector)
-//	if err != nil {
-//		return nil, err
-//	}
-//
-//	return rooms, nil
-//}
+func (r *repository) GetFreeRooms(building, date, time string) (string, error) {
+	rooms, err := r.storage.GetFreeRooms(building, utils.GetWeekDay(date), utils.GetCurrentWeek(), time)
+	if err != nil {
+		return "", err
+	}
+	if rooms == nil {
+		return cst.NoRoomsFound, nil
+	}
+
+	var res strings.Builder
+	res.WriteString(cst.FreeRooms + "\n")
+	for _, r := range rooms {
+		res.WriteString(r.String() + "\n\n")
+	}
+
+	return res.String(), nil
+
+}

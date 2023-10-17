@@ -60,7 +60,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 	default:
 		switch state {
 		case "info":
-			responseText, next, err = states.HandleInfoState(chatID, msgText, repos)
+			responseText, next, err = states.HandleInfoState(chatID, msgText, "info_number", repos)
 			if err != nil {
 				errors.LogError(errors.ErrorUpdatingUser, err)
 				return
@@ -82,14 +82,39 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 				replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)
 			}
 		case "search":
-			// wait for building name
-			// change state to search_date
+			responseText, next, err = states.HandleInfoState(chatID, msgText, "search_date", repos)
+			if err != nil {
+				errors.LogError(errors.ErrorUpdatingUser, err)
+				return
+			}
+			if !next {
+				replyMarkup = keyboard.CreateBuildingKeyboard()
+			} else {
+				replyMarkup = keyboard.CreateDateKeyboard()
+			}
 		case "search_date":
-			// wait for date
-			// change state to search_time
+			responseText, next, err = states.HandleSearchDateState(chatID, msgText, "search_time", repos)
+			if err != nil {
+				errors.LogError(errors.ErrorUpdatingUser, err)
+				return
+			}
+			if !next {
+				replyMarkup = keyboard.CreateDateKeyboard()
+			} else {
+				replyMarkup = keyboard.CreateTimeKeyboard()
+			}
+
 		case "search_time":
-			// wait for date
-			// change state to search_time
+			responseText, next, err = states.HandleSearchTimeState(chatID, msgText, repos)
+			if err != nil {
+				errors.LogError(errors.ErrorUpdatingUser, err)
+				return
+			}
+			if !next {
+				replyMarkup = keyboard.CreateDateKeyboard()
+			} else {
+				replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)
+			}
 		case "finish":
 			responseText = cst.CantUnderstand
 			replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)

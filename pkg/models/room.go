@@ -54,3 +54,13 @@ func (r RoomInfoDto) String(even int) string {
 
 	return b.String()
 }
+
+type FreeRoomDto struct {
+	Building string
+	RoomName string
+	Interval string
+}
+
+func (r FreeRoomDto) String() string {
+	return fmt.Sprintf("%s %s (%s)", cst.Emoji["Room"], r.RoomName, r.Interval)
+}

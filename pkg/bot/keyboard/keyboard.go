@@ -1,6 +1,9 @@
 package keyboard
 
-import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+import (
+	cst "Telegram/pkg/constants"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+)
 
 func CreateMainKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	keyboard := tgbotapi.NewReplyKeyboard(
@@ -19,6 +22,35 @@ func CreateMiniKeyboard(direction string) tgbotapi.ReplyKeyboardMarkup {
 	keyboard := tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton(direction),
+		),
+	)
+
+	return keyboard
+}
+
+func CreateDateKeyboard() tgbotapi.ReplyKeyboardMarkup {
+	keyboard := tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(cst.Today),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(cst.Tomorrow),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(cst.Back),
+		),
+	)
+
+	return keyboard
+}
+
+func CreateTimeKeyboard() tgbotapi.ReplyKeyboardMarkup {
+	keyboard := tgbotapi.NewReplyKeyboard(
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(cst.Now),
+		),
+		tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton(cst.Back),
 		),
 	)
 

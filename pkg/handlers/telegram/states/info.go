@@ -5,18 +5,22 @@ import (
 	"Telegram/pkg/repo"
 )
 
-func HandleInfoState(chatID int64, building string, repos repo.Repositories) (string, bool, error) {
+func HandleInfoState(chatID int64, building, state string, repos repo.Repositories) (string, bool, error) {
 	if _, ok := cst.Buildings[building]; !ok {
 		return cst.BuildingDoesntExist, false, nil
 	}
 
 	updates := map[string]any{
-		"state":          "info_number",
+		"state":          state,
 		"saved_building": building,
 	}
 
 	if err := repos.GetUserRepo().UpdateUser(chatID, updates); err != nil {
 		return "", false, err
+	}
+
+	if state == "search_date" {
+		return cst.EnterDate, true, nil
 	}
 
 	return cst.EnterRoom, true, nil
