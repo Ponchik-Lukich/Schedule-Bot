@@ -78,40 +78,37 @@ func (s *Storage) GetFreeRooms(building string, day, week int, timeStr string) (
 	var result []models.FreeRoomDto
 
 	s.db.Raw(`
-$r1 = (SELECT *
+$r0 = (SELECT *
 FROM rooms
 WHERE rooms.building = ?
   AND rooms.is_available = true
   AND rooms.is_laboratory = false);
 
-$r2 = (SELECT r1.*
+$r1 = (SELECT lessons.*
+FROM lessons
+         JOIN $r0 as r0
+ON lessons.room_id = r0.id
+WHERE lessons.week = ? OR lessons.week = 0 AND lessons.week_day = ?);
+
+$r2 = (SELECT r0.*
 FROM
-    $r1 AS r1
+    $r0 AS r0
     LEFT JOIN
-    lessons
-ON r1.id = lessons.room_id
+    $r1 as lessons
+ON r0.id = lessons.room_id
 WHERE
-    ((lessons.week = ?
-   OR lessons.week = 0)
-  AND lessons.week_day = ?)
-  AND
     (
     lessons.time_from <= ?
   AND lessons.time_to >= ?
     ));
 
-$r3 = (SELECT r1.*
-FROM $r1 as r1 LEFT ONLY JOIN $r2 as r2
-ON r1.id = r2.id);
+$r3 = (SELECT r0.*
+FROM $r0 as r0 LEFT ONLY JOIN $r2 as r2
+ON r0.id = r2.id);
 
 $r4 = (SELECT r3.id as id, r3.name as name, r3.building as building, MAX(lessons.time_to) as time_from
-FROM $r3 AS r3 LEFT JOIN lessons
+FROM $r3 AS r3 LEFT JOIN (SELECT * FROM $r1 as lessons WHERE lessons.time_to < ?) as lessons
 ON r3.id = lessons.room_id
-WHERE 
-((lessons.week = ?
-   OR lessons.week = 0)
-  AND lessons.week_day = ?)
-AND lessons.time_to < ? OR lessons.id IS NULL
 GROUP BY r3.id, r3.name, r3.building);
 
 SELECT r4.id                  as id,
@@ -119,17 +116,10 @@ SELECT r4.id                  as id,
        r4.building            as building,
        r4.time_from           as time_from,
        MIN(lessons.time_from) as time_to
-FROM $r4 AS r4 LEFT JOIN lessons
+FROM $r4 AS r4 LEFT JOIN (SELECT * FROM $r1 as lessons WHERE lessons.time_from > ?) as lessons
 ON r4.id = lessons.room_id
-WHERE
-((lessons.week = ?
- OR lessons.week = 0)
-AND lessons.week_day = ?)
-AND lessons.time_from
-> ?
-   OR lessons.id IS NULL
 GROUP BY r4.id, r4.name, r4.building, r4.time_from;
-`, building, week, day, targetTime, targetTime, week, day, targetTime, week, day, targetTime).Scan(&rooms)
+`, building, week, day, targetTime, targetTime, targetTime, targetTime).Scan(&rooms)
 
 	for _, room := range rooms {
 		result = append(result, models.FreeRoomDto{
