@@ -3,7 +3,6 @@ package models
 import (
 	cst "Telegram/pkg/constants"
 	"fmt"
-	"sort"
 	"time"
 )
 
@@ -29,7 +28,8 @@ type Lesson struct {
 func (l Lesson) String() string {
 	timeFrom := l.TimeFrom.Format("15:04")
 	timeTo := l.TimeTo.Format("15:04")
-	lessonType := ""
+	lessonType, res := "", ""
+
 	switch l.Type {
 	case "Лек":
 		lessonType = cst.Emoji["Lec"]
@@ -43,7 +43,7 @@ func (l Lesson) String() string {
 		lessonType = cst.Emoji["Rez"]
 	}
 
-	lessonDetails := fmt.Sprintf("%s %s - %s  %s %s %s", cst.Emoji["Time"], timeFrom, timeTo, lessonType, l.Type, l.Subject)
+	lessonDetails := fmt.Sprintf("%s %s - %s  %s *%s* %s", cst.Emoji["Time"], timeFrom, timeTo, lessonType, l.Type, l.Subject)
 
 	var tutorsString string
 	for _, tutor := range l.Tutors {
@@ -56,14 +56,11 @@ func (l Lesson) String() string {
 			l.DateTo.Format("02.01.2006"))
 	}
 
-	return fmt.Sprintf("%s\n%s %s\n%s", lessonDetails, cst.Emoji["Tut"], tutorsString, dateRangeString)
-}
+	if len(l.Tutors) != 0 {
+		res = fmt.Sprintf("%s\n%s %s\n%s", lessonDetails, cst.Emoji["Tut"], tutorsString, dateRangeString)
+	} else {
+		res = fmt.Sprintf("%s\n %s", lessonDetails, dateRangeString)
+	}
 
-func sortLessons(lessons []Lesson) {
-	sort.Slice(lessons, func(i, j int) bool {
-		if lessons[i].WeekDay == lessons[j].WeekDay {
-			return lessons[i].TimeFrom.Before(lessons[j].TimeFrom)
-		}
-		return lessons[i].WeekDay < lessons[j].WeekDay
-	})
+	return res
 }

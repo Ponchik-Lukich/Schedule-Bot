@@ -10,6 +10,7 @@ func SendMessage(botApi *tgbotapi.BotAPI, buttons tgbotapi.ReplyKeyboardMarkup, 
 
 	msg := tgbotapi.NewMessage(chatID, text)
 	msg.ReplyMarkup = buttons
+	msg.ParseMode = tgbotapi.ModeMarkdown
 
 	_, err := botApi.Send(msg)
 	if err != nil {

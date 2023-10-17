@@ -42,7 +42,8 @@ func (s *Storage) GetRoomInfo(name, building string) (models.RoomInfoDto, error)
 
 	var lessons []models.Lesson
 
-	err = s.db.Preload("Tutors").Preload("Groups").Where("room_id = ?", room.ID).Order("week_day, time_from").Find(&lessons).Error
+	err = s.db.Preload("Tutors").Preload("Groups").Where("room_id = ?", room.ID).
+		Order("week_day, time_from").Find(&lessons).Error
 	if err != nil {
 		return models.RoomInfoDto{}, err
 	}

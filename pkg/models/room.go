@@ -29,8 +29,6 @@ type RoomInfoDto struct {
 func (r RoomInfoDto) String() string {
 	var b strings.Builder
 
-	sortLessons(r.Lessons)
-
 	available, projector := cst.Emoji["No"], cst.Emoji["No"]
 	if r.IsAvailable {
 		available = cst.Emoji["Yes"]
@@ -39,13 +37,13 @@ func (r RoomInfoDto) String() string {
 		projector = cst.Emoji["Yes"]
 	}
 
-	b.WriteString(fmt.Sprintf("%s %s: %s\n\n", cst.Emoji["Room"], cst.Info, r.RoomName))
-	b.WriteString(fmt.Sprintf("%s: %s     %s: %s\n", cst.Emoji["Ava"], available, cst.Emoji["Proj"], projector))
+	b.WriteString(fmt.Sprintf("%s %s: *%s*\n\n", cst.Emoji["Room"], cst.Info, r.RoomName))
+	b.WriteString(fmt.Sprintf("%s: %s     %s: %s\n\n", cst.Emoji["Ava"], available, cst.Emoji["Proj"], projector))
 
 	currentDay := -1
 	for _, lesson := range r.Lessons {
 		if lesson.WeekDay != currentDay {
-			b.WriteString(fmt.Sprintf("%s\n\n", cst.Days[lesson.WeekDay]))
+			b.WriteString(fmt.Sprintf("*%s*\n\n", cst.Days[lesson.WeekDay]))
 			currentDay = lesson.WeekDay
 		}
 		b.WriteString(fmt.Sprintf("%s\n", lesson.String()))
