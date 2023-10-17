@@ -4,6 +4,7 @@ import (
 	cst "Telegram/pkg/constants"
 	"fmt"
 	"strings"
+	"time"
 )
 
 type Room struct {
@@ -63,4 +64,12 @@ type FreeRoomDto struct {
 
 func (r FreeRoomDto) String() string {
 	return fmt.Sprintf("%s %s (%s)", cst.Emoji["Room"], r.RoomName, r.Interval)
+}
+
+type RawRoomDto struct {
+	ID       string    `gorm:"column:id"`
+	Building string    `gorm:"column:building"`
+	RoomName string    `gorm:"column:name"`
+	TimeFrom time.Time `gorm:"column:time_from"`
+	TimeTo   time.Time `gorm:"column:time_to"`
 }

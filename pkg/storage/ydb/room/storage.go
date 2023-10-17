@@ -5,7 +5,6 @@ import (
 	"Telegram/pkg/models"
 	"fmt"
 	"gorm.io/gorm"
-	"log"
 	"strings"
 	"time"
 )
@@ -54,7 +53,7 @@ func (s *Storage) GetRoomsByName(name string) ([]string, error) {
 	var roomNames []string
 	pattern := strings.Replace(cst.RoomPattern, "number", name, 1)
 
-	err := s.db.Table("rooms").Where("Re2::Match(?)(name)", pattern).Scan(&rooms).Error
+	err := s.db.Table("rooms").Where("name REGEXP ?", pattern).Scan(&rooms).Error
 	fmt.Println(len(rooms))
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -73,89 +72,72 @@ func (s *Storage) GetRoomsByName(name string) ([]string, error) {
 
 func (s *Storage) GetFreeRooms(building string, day, week int, timeStr string) ([]models.FreeRoomDto, error) {
 	defaultDateTime := "2020-01-01T" + timeStr + ":00.000000Z"
-	timeValue, _ := time.Parse(time.RFC3339, defaultDateTime)
-	timeValue = timeValue.Add(-3 * time.Hour)
+	targetTime, _ := time.Parse(time.RFC3339, defaultDateTime)
+	targetTime = targetTime.Add(-3 * time.Hour)
+	var rooms []models.RawRoomDto
+	var result []models.FreeRoomDto
 
-	var roomsInBuilding []models.Room
-	err := s.db.Where("building = ?", building).Find(&roomsInBuilding).Error
-	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil, err
-	}
-	log.Println(len(roomsInBuilding), "rooms in building", building)
-	log.Println(day, week, timeValue)
+	s.db.Raw(`
+$r1 = (SELECT *
+FROM rooms
+WHERE rooms.building = ?
+  AND rooms.is_available = true
+  AND rooms.is_laboratory = false);
 
-	var freeRooms []models.FreeRoomDto
-	for _, room := range roomsInBuilding {
-		var lessonsInRoom []models.Lesson
-		err = s.db.Where("room_id = ?", room.ID).
-			Where("week = 0 OR week = ?", week).
-			Where("week_day = ?", day).
-			Order("time_from").Find(&lessonsInRoom).Error
-		log.Println(len(lessonsInRoom), "lessons in room", room.Name)
-		if err != nil && err != gorm.ErrRecordNotFound {
-			return nil, err
-		}
+$r2 = (SELECT r1.*
+FROM
+    $r1 AS r1
+    LEFT JOIN
+    lessons
+ON r1.id = lessons.room_id
+WHERE
+    ((lessons.week = ?
+   OR lessons.week = 0)
+  AND lessons.week_day = ?)
+  AND
+    (
+    lessons.time_from <= ?
+  AND lessons.time_to >= ?
+    ));
 
-		if len(lessonsInRoom) == 0 {
-			freeRooms = append(freeRooms, models.FreeRoomDto{
-				Building: room.Building,
-				RoomName: room.Name,
-				Interval: fmt.Sprintf("8:30 - 21:00"),
-			})
-			continue
-		}
+$r3 = (SELECT r1.*
+FROM $r1 as r1 LEFT ONLY JOIN $r2 as r2
+ON r1.id = r2.id);
 
-		if len(lessonsInRoom) == 1 {
-			if timeValue.Before(lessonsInRoom[0].TimeFrom) {
-				freeRooms = append(freeRooms, models.FreeRoomDto{
-					Building: room.Building,
-					RoomName: room.Name,
-					Interval: fmt.Sprintf("8:30 - %s", lessonsInRoom[0].TimeFrom.Format("15:04")),
-				})
-				break
-			} else if timeValue.After(lessonsInRoom[0].TimeTo) {
-				freeRooms = append(freeRooms, models.FreeRoomDto{
-					Building: room.Building,
-					RoomName: room.Name,
-					Interval: fmt.Sprintf("%s - 21:00", lessonsInRoom[0].TimeTo.Format("15:04")),
-				})
-				break
-			} else {
-				continue
-			}
-		}
+$r4 = (SELECT r3.id as id, r3.name as name, r3.building as building, MAX(lessons.time_to) as time_from
+FROM $r3 AS r3 LEFT JOIN lessons
+ON r3.id = lessons.room_id
+WHERE 
+((lessons.week = ?
+   OR lessons.week = 0)
+  AND lessons.week_day = ?)
+AND lessons.time_to < ? OR lessons.id IS NULL
+GROUP BY r3.id, r3.name, r3.building);
 
-		prevTime := ""
-		for _, lesson := range lessonsInRoom {
-			fmt.Println(lesson.TimeFrom, lesson.TimeTo, timeValue)
-			if timeValue.After(lesson.TimeFrom) && timeValue.Before(lesson.TimeTo) {
-				fmt.Println("in lesson")
-				break
-			}
-			if timeValue.After(lesson.TimeTo) {
-				prevTime = lesson.TimeTo.Format("15:04")
-				fmt.Println("prev added")
-			}
+SELECT r4.id                  as id,
+       r4.name                as name,
+       r4.building            as building,
+       r4.time_from           as time_from,
+       MIN(lessons.time_from) as time_to
+FROM $r4 AS r4 LEFT JOIN lessons
+ON r4.id = lessons.room_id
+WHERE
+((lessons.week = ?
+ OR lessons.week = 0)
+AND lessons.week_day = ?)
+AND lessons.time_from
+> ?
+   OR lessons.id IS NULL
+GROUP BY r4.id, r4.name, r4.building, r4.time_from;
+`, building, week, day, targetTime, targetTime, week, day, targetTime, week, day, targetTime).Scan(&rooms)
 
-			if timeValue.Before(lesson.TimeFrom) && prevTime != "" {
-				fmt.Println("time added")
-				freeRooms = append(freeRooms, models.FreeRoomDto{
-					Building: room.Building,
-					RoomName: room.Name,
-					Interval: fmt.Sprintf("%s - %s", prevTime, lesson.TimeFrom.Format("15:04")),
-				})
-				break
-			}
-		}
-		if prevTime != "" && timeValue.After(lessonsInRoom[len(lessonsInRoom)-1].TimeTo) {
-			fmt.Println("after added")
-			freeRooms = append(freeRooms, models.FreeRoomDto{
-				Building: room.Building,
-				RoomName: room.Name,
-				Interval: fmt.Sprintf("%s - 21:00", prevTime),
-			})
-		}
+	for _, room := range rooms {
+		result = append(result, models.FreeRoomDto{
+			Building: room.Building,
+			RoomName: room.RoomName,
+			Interval: string(room.TimeFrom.Format("15:04")) + " - " + string(room.TimeTo.Format("15:04")),
+		})
 	}
 
-	return freeRooms, nil
+	return result, nil
 }
