@@ -39,8 +39,7 @@ func HandleInfoNumberState(chatID int64, number string, repos repo.Repositories)
 	}
 
 	updates := map[string]any{
-		"state":          "finish",
-		"saved_building": "",
+		"state": "finish",
 	}
 
 	if err := repos.GetUserRepo().UpdateUser(chatID, updates); err != nil {

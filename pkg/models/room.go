@@ -26,7 +26,7 @@ type RoomInfoDto struct {
 	Lessons      []Lesson
 }
 
-func (r RoomInfoDto) String() string {
+func (r RoomInfoDto) String(even int) string {
 	var b strings.Builder
 
 	available, projector := cst.Emoji["No"], cst.Emoji["No"]
@@ -42,6 +42,9 @@ func (r RoomInfoDto) String() string {
 
 	currentDay := -1
 	for _, lesson := range r.Lessons {
+		if lesson.Week != 0 && lesson.Week != even {
+			continue
+		}
 		if lesson.WeekDay != currentDay {
 			b.WriteString(fmt.Sprintf("*%s*\n\n", cst.Days[lesson.WeekDay]))
 			currentDay = lesson.WeekDay

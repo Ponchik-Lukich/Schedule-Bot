@@ -3,6 +3,7 @@ package room
 import (
 	cst "Telegram/pkg/constants"
 	"Telegram/pkg/storage/room"
+	"Telegram/pkg/utils"
 	"strings"
 )
 
@@ -43,7 +44,7 @@ func (r *repository) GetRoomInfo(building, number string) (string, bool, error) 
 	if err != nil {
 		return "", false, err
 	}
-	res := roomInfo.String()
+	res := roomInfo.String(utils.GetCurrentWeek())
 
 	return res, true, nil
 }
