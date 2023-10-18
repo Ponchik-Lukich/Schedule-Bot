@@ -47,7 +47,7 @@ func (r RoomInfoDto) String(even int) string {
 			continue
 		}
 		if lesson.WeekDay != currentDay {
-			b.WriteString(fmt.Sprintf("*%s*\n\n", cst.Days[lesson.WeekDay]))
+			b.WriteString(fmt.Sprintf("<b>%s</b>\n\n", cst.Days[lesson.WeekDay]))
 			currentDay = lesson.WeekDay
 		}
 		b.WriteString(fmt.Sprintf("%s\n", lesson.String()))

@@ -57,7 +57,7 @@ func CreateTimeKeyboard() tgbotapi.ReplyKeyboardMarkup {
 	return keyboard
 }
 
-func CreateBuildingKeyboard() tgbotapi.ReplyKeyboardMarkup {
+func CreateBuildingKeyboard(expanded bool) tgbotapi.ReplyKeyboardMarkup {
 	keyboard := tgbotapi.NewReplyKeyboard(
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Корпус А"),
@@ -89,19 +89,21 @@ func CreateBuildingKeyboard() tgbotapi.ReplyKeyboardMarkup {
 		),
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Корпус 47"),
-			tgbotapi.NewKeyboardButton("Корпус 5 (Технопарк)"),
+			tgbotapi.NewKeyboardButton("Корпус 5"),
 		),
 		tgbotapi.NewKeyboardButtonRow(
 			tgbotapi.NewKeyboardButton("Корпус 64"),
 			tgbotapi.NewKeyboardButton("Корпус МПК"),
 		),
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("Всё равно"),
-		),
-		tgbotapi.NewKeyboardButtonRow(
-			tgbotapi.NewKeyboardButton("Назад"),
-		),
 	)
+	if expanded {
+		keyboard.Keyboard = append(keyboard.Keyboard, tgbotapi.NewKeyboardButtonRow(
+			tgbotapi.NewKeyboardButton("Всё равно"),
+		))
+	}
+	keyboard.Keyboard = append(keyboard.Keyboard, tgbotapi.NewKeyboardButtonRow(
+		tgbotapi.NewKeyboardButton("Назад"),
+	))
 
 	return keyboard
 }

@@ -7,8 +7,17 @@ WITH consts AS (SELECT CAST(? AS TIMESTAMP) AS needed_time,
      r1 AS (SELECT *
             FROM rooms
             WHERE is_available = true
-              AND building = ?
-              AND is_laboratory = false),
+               AND building NOT IN (
+                  'Корпус Спортивный', 
+                  'Корпус Нет корпуса', 
+                  'Корпус ФМ', 
+                  'Корпус ХХ', 
+                  'Корпус 44а', 
+                  'Корпус 6А'
+               )
+               AND name NOT LIKE 'каф%'
+               AND building = ?
+               AND is_laboratory = false),
      r2 AS (SELECT lessons.*
             FROM lessons
                      JOIN r1

@@ -32,7 +32,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
-		replyMarkup = keyboard.CreateBuildingKeyboard()
+		replyMarkup = keyboard.CreateBuildingKeyboard(true)
 		photo = true
 	case cst.Info:
 		responseText, err = HandleSearchCom(chatID, "info", repos)
@@ -40,7 +40,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 			errors.LogError(errors.ErrorGettingUserState, err)
 			return
 		}
-		replyMarkup = keyboard.CreateBuildingKeyboard()
+		replyMarkup = keyboard.CreateBuildingKeyboard(false)
 		photo = true
 	case cst.Back:
 		msg, err := HandleBackCom(chatID, state, repos)
@@ -66,7 +66,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 				return
 			}
 			if !next {
-				replyMarkup = keyboard.CreateBuildingKeyboard()
+				replyMarkup = keyboard.CreateBuildingKeyboard(false)
 			} else {
 				replyMarkup = keyboard.CreateMiniKeyboard(cst.Back)
 			}
@@ -88,7 +88,7 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 				return
 			}
 			if !next {
-				replyMarkup = keyboard.CreateBuildingKeyboard()
+				replyMarkup = keyboard.CreateBuildingKeyboard(true)
 			} else {
 				replyMarkup = keyboard.CreateDateKeyboard()
 			}
