@@ -80,8 +80,6 @@ func (s *Storage) GetRoomsByName(name string) ([]string, error) {
 func (s *Storage) GetFreeRooms(building string, day, week int, timeStr string) ([]models.FreeRoomDto, error) {
 	defaultDateTime := "2020-01-01T" + timeStr + ":00.000000Z"
 	targetTime, _ := time.Parse(time.RFC3339, defaultDateTime)
-	//targetTime = targetTime.Add(-3 * time.Hour)
-	fmt.Println(targetTime, week, day)
 	var rooms []models.RawRoomDto
 	var result []models.FreeRoomDto
 
@@ -100,7 +98,8 @@ func (s *Storage) GetFreeRooms(building string, day, week int, timeStr string) (
 		result = append(result, models.FreeRoomDto{
 			Building: r.Building,
 			RoomName: r.RoomName,
-			Interval: string(r.TimeFrom.Format("15:04")) + " - " + string(r.TimeTo.Format("15:04")),
+			Interval: string(r.TimeFrom.UTC().Add(3*time.Hour).Format("15:04")) + " - " +
+				string(r.TimeTo.UTC().Add(3*time.Hour).Format("15:04")),
 		})
 	}
 
