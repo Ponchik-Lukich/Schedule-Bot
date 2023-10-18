@@ -18,11 +18,7 @@ const (
 	RoomPattern         = `^(|.*\D)number(|\D.*)$`
 	RoomsFound          = "Найдено несколько кабинетов! \nПожалуйста, уточните номер кабинета:"
 	FreeRooms           = "Свободные кабинеты:"
-	IsAvailable         = "Возможность занять"
-	No                  = "Нет"
-	Yes                 = "Да"
-	Schedule            = "Расписание:"
-	Projector           = "Наличие проектора"
+	BackToMenu          = "Ошибка. Возврат в главное меню."
 	FullDateLayout      = "2006-02-01"
 	DateLayout          = "02-01"
 	EnterDate           = "Введите дату (День-Месяц)"

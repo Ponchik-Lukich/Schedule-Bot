@@ -111,13 +111,16 @@ func HandleUpdateCom(botApi *tgbotapi.BotAPI, update *tgbotapi.Update, repos rep
 				return
 			}
 			if !next {
-				replyMarkup = keyboard.CreateDateKeyboard()
+				replyMarkup = keyboard.CreateMiniKeyboard(cst.Back)
 			} else {
 				replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)
 			}
 		case "finish":
 			responseText = cst.CantUnderstand
 			replyMarkup = keyboard.CreateMiniKeyboard(cst.Menu)
+		case "":
+			responseText = cst.BackToMenu
+			replyMarkup = keyboard.CreateMainKeyboard()
 		default:
 			responseText = cst.CantUnderstand
 			replyMarkup = keyboard.CreateMainKeyboard()
