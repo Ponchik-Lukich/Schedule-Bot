@@ -1,9 +1,9 @@
-package ydb
+package postges
 
 type Config struct {
-	Database string
+	DSN string
 }
 
 func (c *Config) ReturnDatabase() string {
-	return c.Database
+	return c.DSN
 }

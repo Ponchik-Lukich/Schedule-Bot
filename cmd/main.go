@@ -2,10 +2,11 @@ package main
 
 import (
 	"Telegram/pkg/bot"
+	cst "Telegram/pkg/constants"
 	"Telegram/pkg/repo"
 	"Telegram/pkg/router"
 	"Telegram/pkg/storage"
-	"Telegram/pkg/storage/ydb"
+	"Telegram/pkg/storage/postges"
 	"context"
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
@@ -53,16 +54,16 @@ func LoadConfiguration() error {
 }
 
 func InitializeStorage() (storage.Storage, error) {
-	dbUrl := os.Getenv("DB_URL")
+	dbUrl := os.Getenv("DSN")
 	if dbUrl == "" {
 		return nil, fmt.Errorf("db url is required")
 	}
 
-	dbConfig := &ydb.Config{
-		Database: dbUrl,
+	dbConfig := &postges.Config{
+		DSN: dbUrl,
 	}
 
-	db, err := storage.NewStorage("ydb", dbConfig)
+	db, err := storage.NewStorage(cst.Postgres, dbConfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize database: %w", err)
 	}
