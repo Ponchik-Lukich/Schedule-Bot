@@ -10,7 +10,7 @@ import (
 type Room struct {
 	Model
 	ID           string `json:"id" gorm:"primary_key"`
-	Name         string `json:"name" gorm:"index"`
+	Name         string `json:"name"`
 	Building     string `json:"building" gorm:"index"`
 	IsLaboratory bool   `json:"is_laboratory" gorm:"index"`
 	HasComputer  bool   `json:"has_computer" gorm:"index"`

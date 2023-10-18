@@ -21,8 +21,14 @@ func NewStorage(db *gorm.DB) *Storage {
 func (s *Storage) GetRoomInfo(name, building string) (models.RoomInfoDto, error) {
 	var room models.Room
 	var roomInfo models.RoomInfoDto
+	var err error
 
-	err := s.db.Where("building = ?", building).Where("name = ?", name).First(&room).Error
+	if building == cst.Any {
+		err = s.db.Where("name = ?", name).First(&room).Error
+	} else {
+		err = s.db.Where("building = ?", building).Where("name = ?", name).First(&room).Error
+	}
+
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return models.RoomInfoDto{}, nil
