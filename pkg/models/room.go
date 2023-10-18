@@ -38,7 +38,7 @@ func (r RoomInfoDto) String(even int) string {
 		projector = cst.Emoji["Yes"]
 	}
 
-	b.WriteString(fmt.Sprintf("%s %s: *%s*\n\n", cst.Emoji["Room"], cst.Info, r.RoomName))
+	b.WriteString(fmt.Sprintf("%s %s: <b>%s</b>\n\n", cst.Emoji["Room"], cst.Info, r.RoomName))
 	b.WriteString(fmt.Sprintf("%s: %s     %s: %s\n\n", cst.Emoji["Ava"], available, cst.Emoji["Proj"], projector))
 
 	currentDay := -1

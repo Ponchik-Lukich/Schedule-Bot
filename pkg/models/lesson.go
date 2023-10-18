@@ -43,7 +43,7 @@ func (l Lesson) String() string {
 		lessonType = cst.Emoji["Rez"]
 	}
 
-	lessonDetails := fmt.Sprintf("%s %s - %s  %s *%s* %s", cst.Emoji["Time"], timeFrom, timeTo, lessonType, l.Type, l.Subject)
+	lessonDetails := fmt.Sprintf("%s %s - %s  %s <b>%s</b> %s", cst.Emoji["Time"], timeFrom, timeTo, lessonType, l.Type, l.Subject)
 
 	var tutorsString string
 	for _, tutor := range l.Tutors {

@@ -59,11 +59,10 @@ func (r *repository) GetFreeRooms(building, date, time string) (string, error) {
 	}
 
 	var res strings.Builder
-	res.WriteString("*" + cst.FreeRooms + "*\n\n")
+	res.WriteString("<b>" + cst.FreeRooms + "</b>\n\n")
 	for _, r := range rooms {
 		res.WriteString(r.String() + "\n\n")
 	}
 
 	return res.String(), nil
-
 }
