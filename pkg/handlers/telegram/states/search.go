@@ -12,10 +12,10 @@ func HandleSearchDateState(chatID int64, date, state string, repos repo.Reposito
 
 	switch date {
 	case cst.Today:
-		today := time.Now()
+		today := time.Now().Add(3 * time.Hour)
 		targetDay = today.Format(cst.DateLayout)
 	case cst.Tomorrow:
-		tomorrow := time.Now().Add(24 * time.Hour)
+		tomorrow := time.Now().Add(27 * time.Hour)
 		targetDay = tomorrow.Format(cst.DateLayout)
 	default:
 		if !utils.IsDate(date) {

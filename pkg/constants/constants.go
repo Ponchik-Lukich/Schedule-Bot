@@ -23,7 +23,7 @@ const (
 	Yes                 = "Да"
 	Schedule            = "Расписание:"
 	Projector           = "Наличие проектора"
-	FullDateLayout      = "2006-01-02"
+	FullDateLayout      = "2006-02-01"
 	DateLayout          = "02-01"
 	EnterDate           = "Введите дату (День-Месяц)"
 	Today               = "Сегодня"

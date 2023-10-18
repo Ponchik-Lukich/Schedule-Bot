@@ -2,8 +2,8 @@ package room
 
 var GetFreeRooms = `
 WITH consts AS (SELECT CAST(? AS TIMESTAMP) AS needed_time,
-                       CAST('2020-01-01T03:00:00.000000Z' AS TIMESTAMP) AS default_time_from,
-                       CAST('2020-01-01T20:00:00.000000Z' AS TIMESTAMP) AS default_time_to),
+                       CAST('2020-01-01T06:00:00.000000Z' AS TIMESTAMP) AS default_time_from,
+                       CAST('2020-01-01T23:00:00.000000Z' AS TIMESTAMP) AS default_time_to),
      r1 AS (SELECT *
             FROM rooms
             WHERE is_available = true
