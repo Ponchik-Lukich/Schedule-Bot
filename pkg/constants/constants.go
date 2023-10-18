@@ -2,6 +2,7 @@ package constants
 
 const (
 	Ydb                 = "ydb"
+	Postgres            = "postgres"
 	Greeting            = "Привет! Я бот, который поможет тебе найти свободный кабинет в университете."
 	BuildingChoice      = "Выберите корпус: "
 	Choice              = "Выберите функцию:"
@@ -33,7 +34,7 @@ const (
 	TimeLayout          = "15:04"
 	WrongTimeFormat     = "Неверный формат времени. Пожалуйста, введите время в формате Часы:Минуты"
 	NoRoomsFound        = "К сожалению, свободных кабинетов не найдено. Попробуйте выбрать другое время."
-	Building            = "AND rooms.building = ?"
+	Building            = "AND building = ?"
 	Any                 = "Всё равно"
 )
 

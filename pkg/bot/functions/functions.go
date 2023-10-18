@@ -1,6 +1,7 @@
 package functions
 
 import (
+	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -14,6 +15,7 @@ func SendMessage(botApi *tgbotapi.BotAPI, buttons tgbotapi.ReplyKeyboardMarkup, 
 
 	_, err := botApi.Send(msg)
 	if err != nil {
+		fmt.Println(err)
 		return err
 	}
 

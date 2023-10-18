@@ -1,14 +1,13 @@
-package ydb
+package postges
 
 import (
+	postgresRoom "Telegram/pkg/storage/postges/room"
+	postgresUser "Telegram/pkg/storage/postges/user"
 	"Telegram/pkg/storage/room"
 	"Telegram/pkg/storage/user"
-	ydbRoom "Telegram/pkg/storage/ydb/room"
-	ydbUser "Telegram/pkg/storage/ydb/user"
-	"context"
-	ydb "github.com/PotatoHD404/gorm-driver"
-	environ "github.com/ydb-platform/ydb-go-sdk-auth-environ"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"time"
 )
 
 type Storage struct {
@@ -25,13 +24,19 @@ func (s *Storage) Init() *gorm.DB {
 }
 
 func (s *Storage) Connect() error {
-	ctx := context.Background()
+	db, err := gorm.Open(postgres.Open(s.cfg.DSN))
+	if err != nil {
+		return err
+	}
 
-	db, err := gorm.Open(ydb.Open(s.cfg.Database,
-		ydb.With(
-			environ.WithEnvironCredentials(ctx),
-		)),
-	)
+	sqlDB, err := db.DB()
+	if err != nil {
+		return err
+	}
+
+	sqlDB.SetMaxIdleConns(1)
+	sqlDB.SetMaxOpenConns(1)
+	sqlDB.SetConnMaxLifetime(time.Minute * 10)
 
 	if err != nil {
 		return err
@@ -53,9 +58,9 @@ func (s *Storage) Close() error {
 }
 
 func (s *Storage) GetUserStorage() user.Storage {
-	return ydbUser.NewStorage(s.db)
+	return postgresUser.NewStorage(s.db)
 }
 
 func (s *Storage) GetRoomStorage() room.Storage {
-	return ydbRoom.NewStorage(s.db)
+	return postgresRoom.NewStorage(s.db)
 }

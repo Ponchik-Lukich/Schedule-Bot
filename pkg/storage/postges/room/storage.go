@@ -60,7 +60,7 @@ func (s *Storage) GetRoomsByName(name string) ([]string, error) {
 	var roomNames []string
 	pattern := strings.Replace(cst.RoomPattern, "number", name, 1)
 
-	err := s.db.Table("rooms").Where("name REGEXP ?", pattern).Scan(&rooms).Error
+	err := s.db.Table("rooms").Where("name ~ ?", pattern).Scan(&rooms).Error
 	fmt.Println(len(rooms))
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

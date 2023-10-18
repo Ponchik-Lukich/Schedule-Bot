@@ -1,11 +1,11 @@
 package storage
 
 import (
-	"Telegram/pkg/constants"
+	cst "Telegram/pkg/constants"
 	errorsMes "Telegram/pkg/errors"
+	"Telegram/pkg/storage/postges"
 	"Telegram/pkg/storage/room"
 	"Telegram/pkg/storage/user"
-	"Telegram/pkg/storage/ydb"
 	"errors"
 	"gorm.io/gorm"
 )
@@ -21,9 +21,9 @@ type Storage interface {
 
 func NewStorage(dbType string, cfg Config) (Storage, error) {
 	switch dbType {
-	case constants.Ydb:
-		if ydbCfg, ok := cfg.(*ydb.Config); ok {
-			return ydb.NewStorage(*ydbCfg), nil
+	case cst.Postgres:
+		if postgresCfg, ok := cfg.(*postges.Config); ok {
+			return postges.NewStorage(*postgresCfg), nil
 		} else {
 			return nil, errors.New(errorsMes.InvalidConfig)
 		}
