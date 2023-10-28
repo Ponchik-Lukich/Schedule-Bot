@@ -35,7 +35,7 @@ func (r *repository) GetRoomInfo(building, number string) (string, bool, error) 
 		var res strings.Builder
 		res.WriteString(cst.RoomsFound)
 		for _, name := range roomNames {
-			res.WriteString(name + "\n")
+			res.WriteString(strings.Split(name, "-")[1] + "\n")
 		}
 		return res.String(), false, nil
 	}

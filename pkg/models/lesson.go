@@ -26,8 +26,8 @@ type Lesson struct {
 }
 
 func (l Lesson) String() string {
-	timeFrom := l.TimeFrom.Format("15:04")
-	timeTo := l.TimeTo.Format("15:04")
+	timeFrom := l.TimeFrom.UTC().Add(3 * time.Hour).Format("15:04")
+	timeTo := l.TimeTo.UTC().Add(3 * time.Hour).Format("15:04")
 	lessonType, res := "", ""
 
 	switch l.Type {
